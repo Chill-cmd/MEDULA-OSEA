@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Hematopoietic Physiology Lab</title>
+<title>Laboratorio de Fisiología Hematopoyética</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
@@ -188,253 +188,253 @@ footer.appfoot{text-align:center; color:var(--text-faint); font-size:11.5px; fon
 </head>
 <body>
 <header class="topbar">
-  <button class="brand" id="btnHome" onclick="navigate('home')"><span class="dot">&#9673;</span> HEMATOPOIETIC PHYSIOLOGY LAB</button>
-  <div class="crumb" id="crumb">Home</div>
-  <div class="readout"><span class="led"></span> SIM READY</div>
+  <button class="brand" id="btnHome" onclick="navigate('home')"><span class="dot">&#9673;</span> LABORATORIO DE FISIOLOGÍA HEMATOPOYÉTICA</button>
+  <div class="crumb" id="crumb">Inicio</div>
+  <div class="readout"><span class="led"></span> SISTEMA LISTO</div>
 </header>
 <main id="app"></main>
-<footer class="appfoot">Educational simulator &middot; not a diagnostic tool &middot; Medicina &middot; built for active recall</footer>
+<footer class="appfoot">Simulador educativo &middot; no es una herramienta diagnóstica &middot; Medicina &middot; hecho para el recall activo</footer>
 <script>
 /* === DATA_START === */
 const SRC_MRI = "Londoño MA, Vallejo JM, Manzano AC. Rev Colomb Radiol. 2015;26(2):4206-12";
 
 const MARROW_COMPOSITION = {
   red:{
-    name:"Red marrow", cellPct:60, fatCellPct:40,
+    name:"Médula ósea roja", cellPct:60, fatCellPct:40,
     chem:{fat:40, water:40, protein:20},
-    function:"Site of active hematopoiesis. Richly vascularized to support cell release into sinusoids.",
+    function:"Es el sitio de la hematopoyesis activa. Está ricamente vascularizada para facilitar la liberación de células hacia los sinusoides.",
     color:"var(--marrow-red)"
   },
   yellow:{
-    name:"Yellow marrow", cellPct:5, fatCellPct:95,
+    name:"Médula ósea amarilla", cellPct:5, fatCellPct:95,
     chem:{fat:80, water:15, protein:5},
-    function:"Predominantly adipose. Hematopoietic function is minimal; poorly vascularized compared to red marrow.",
+    function:"Compuesta casi en su totalidad por tejido adiposo. Su función hematopoyética es mínima; está pobremente vascularizada en comparación con la médula roja.",
     color:"var(--marrow)"
   }
 };
 
 const MRI_SEQUENCES = {
   T1:{
-    label:"T1-weighted",
-    yellow:{gray:"#f2f2f2", desc:"High signal — fat shortens T1, so yellow marrow looks as bright as subcutaneous fat."},
-    red:{gray:"#5c5c5c", desc:"Intermediate-low signal from its high cellularity and water content, but usually still brighter than muscle or intervertebral discs."},
-    why:"T1-weighted sequences are highly sensitive to fat. Fat's short T1 relaxation time produces high signal, while the greater cellular and water content of red marrow lowers its relative signal. This is the sequence with the most contrast between red and yellow marrow."
+    label:"Potenciada en T1",
+    yellow:{gray:"#f2f2f2", desc:"Señal alta — la grasa acorta el T1, por lo que la médula amarilla se ve tan brillante como la grasa subcutánea."},
+    red:{gray:"#5c5c5c", desc:"Señal intermedia-baja por su alto contenido celular y de agua, aunque suele ser más brillante que el músculo o los discos intervertebrales."},
+    why:"Las secuencias T1 son muy sensibles a la grasa. El T1 corto de la grasa produce señal alta, mientras que el mayor contenido celular y de agua de la médula roja reduce su señal relativa. Esta es la secuencia con mayor contraste entre médula roja y amarilla."
   },
   T2:{
-    label:"T2-weighted",
-    yellow:{gray:"#d8d8d8", desc:"High signal, similar to T1."},
-    red:{gray:"#9a9a9a", desc:"Intermediate signal — still lower than fat, but the gap between red and yellow marrow is less pronounced than on T1."},
-    why:"Both fat and water contribute substantial T2 signal, so the relaxation-time difference between red and yellow marrow is smaller on T2 than on T1. The fat/red-marrow contrast is real but less dramatic."
+    label:"Potenciada en T2",
+    yellow:{gray:"#d8d8d8", desc:"Señal alta, similar a T1."},
+    red:{gray:"#9a9a9a", desc:"Señal intermedia — sigue siendo menor que la de la grasa, pero la diferencia entre médula roja y amarilla es menos marcada que en T1."},
+    why:"Tanto la grasa como el agua aportan señal T2 considerable, por lo que la diferencia en el tiempo de relajación entre médula roja y amarilla es menor en T2 que en T1. El contraste grasa/médula roja es real, pero menos llamativo."
   },
   STIR:{
-    label:"STIR (fat-suppressed)",
-    yellow:{gray:"#161616", desc:"Signal is nulled — STIR suppresses fat, so yellow marrow turns dark."},
-    red:{gray:"#b8b8b8", desc:"Relatively higher signal once fat is suppressed, because red marrow's water/cellular content is not nulled."},
-    why:"STIR (Short TI Inversion Recovery) uses an inversion pulse timed to null fat signal. With fat suppressed, red marrow can appear relatively bright — this normal finding must not be mistaken for contrast enhancement on a gadolinium T1 sequence, which is a different phenomenon entirely."
+    label:"STIR (supresión grasa)",
+    yellow:{gray:"#161616", desc:"La señal se anula — STIR suprime la grasa, así que la médula amarilla se ve oscura."},
+    red:{gray:"#b8b8b8", desc:"Señal relativamente más alta una vez suprimida la grasa, porque el contenido de agua y células de la médula roja no se anula."},
+    why:"STIR (Short TI Inversion Recovery) usa un pulso de inversión programado para anular la señal de la grasa. Con la grasa suprimida, la médula roja puede verse relativamente brillante — este hallazgo normal no debe confundirse con el realce por contraste de una secuencia T1 con gadolinio, que es un fenómeno completamente distinto."
   }
 };
 
 const AGE_STAGES = [
   {
     id:"fetal", label:"Fetal",
-    text:"Diaphyses and metaphyses of long bones show low T1 signal because red marrow predominates. Unossified epiphyses are cartilaginous and show intermediate T1 signal from their high water content.",
+    text:"Las diáfisis y metáfisis de los huesos largos muestran señal T1 baja porque predomina la médula roja. Las epífisis aún no osificadas son cartilaginosas y muestran señal T1 intermedia por su alto contenido de agua.",
     regions:{skull:"cartilage", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"red", humDiaR:"red", femProxL:"red", femProxR:"red", femDiaL:"red", femDiaR:"red", handL:"cartilage", handR:"cartilage", footL:"cartilage", footR:"cartilage"}
   },
   {
-    id:"newborn", label:"Newborn",
-    text:"As epiphyses begin to ossify, fatty marrow appears in the new ossification centers as high T1 signal foci. Phalanges and metatarsals remain high signal on T2 from abundant cartilage water.",
+    id:"newborn", label:"Recién nacido",
+    text:"Cuando las epífisis comienzan a osificarse, aparece médula grasa en los nuevos centros de osificación como focos de señal alta en T1. Las falanges y metatarsianos mantienen señal alta en T2 por el abundante contenido de agua del cartílago.",
     regions:{skull:"red", spine:"red", chest:"red", pelvis:"red", humProxL:"redyellow", humProxR:"redyellow", humDiaL:"red", humDiaR:"red", femProxL:"redyellow", femProxR:"redyellow", femDiaL:"red", femDiaR:"red", handL:"red", handR:"red", footL:"red", footR:"red"}
   },
   {
-    id:"y1", label:"1 year",
-    text:"Marrow conversion begins in the hand and foot phalanges near the end of the first year, completing around age 1. Conversion also starts in the femoral diaphyses.",
+    id:"y1", label:"1 año",
+    text:"La conversión medular inicia en las falanges de manos y pies cerca del final del primer año, completándose alrededor del año de edad. La conversión también comienza en las diáfisis femorales.",
     regions:{skull:"red", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"redyellow", humDiaR:"redyellow", femProxL:"red", femProxR:"red", femDiaL:"redyellow", femDiaR:"redyellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
   },
   {
-    id:"y10", label:"10 years",
-    text:"By age 10, fatty marrow occupies most diaphyseal regions of the limbs and skull; red marrow persists only in the metaphyses. The axial skeleton (spine, thorax, pelvis) still holds mostly red marrow through the first decade, converting later on a less predictable pattern.",
+    id:"y10", label:"10 años",
+    text:"Hacia los 10 años, la médula grasa ocupa la mayor parte de las regiones diafisarias de las extremidades y el cráneo; la médula roja persiste solo en las metáfisis. El esqueleto axial (columna, tórax, pelvis) conserva mayormente médula roja durante la primera década, y se convierte después con un patrón menos predecible.",
     regions:{skull:"yellow", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"yellow", humDiaR:"yellow", femProxL:"red", femProxR:"red", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
   },
   {
-    id:"adol", label:"10–25y (Adolescent)",
-    text:"Fatty marrow signal now predominates throughout the extremities, but residual red marrow remains in the femoral and humeral metaphyses — seen as relatively higher T1 signal in the diaphyses where fat now dominates. Axial conversion continues, unevenly.",
+    id:"adol", label:"10–25 años (Adolescente)",
+    text:"La señal de médula grasa ahora predomina en toda la extremidad, pero persiste médula roja residual en las metáfisis femoral y humeral — se observa como señal T1 relativamente más alta en las diáfisis, donde ahora predomina la grasa. La conversión axial continúa, de forma desigual.",
     regions:{skull:"yellow", spine:"redyellow", chest:"red", pelvis:"red", humProxL:"redyellow", humProxR:"redyellow", humDiaL:"yellow", humDiaR:"yellow", femProxL:"redyellow", femProxR:"redyellow", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
   },
   {
-    id:"adult", label:"25y+ (Adult)",
-    text:"The adult pattern is reached around age 25: red marrow persists in the axial skeleton, sternum, ribs, and the proximal femur and humerus. A low-T1-signal band (growth cartilage remnant) still separates epiphysis from diaphysis, thinning to a residual line once it closes.",
+    id:"adult", label:"25+ años (Adulto)",
+    text:"El patrón adulto se alcanza alrededor de los 25 años: la médula roja persiste en el esqueleto axial, el esternón, las costillas y el fémur/húmero proximales. Una banda de señal T1 baja (remanente del cartílago de crecimiento) sigue separando la epífisis de la diáfisis, adelgazándose hasta una línea residual una vez que se cierra.",
     regions:{skull:"yellow", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"yellow", humDiaR:"yellow", femProxL:"red", femProxR:"red", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
   }
 ];
 const REGION_COLOR = {red:"var(--marrow-red)", yellow:"var(--marrow)", redyellow:"#c77a5a", cartilage:"var(--cartilage)"};
 
 const HEMATO_TREE = {
-  id:"hsc", name:"Hematopoietic Stem Cell",
-  info:{origin:"Resides in the red marrow hematopoietic niche, anchored to stromal cells and sinusoidal endothelium.", function:"Pluripotent and self-renewing; gives rise to all blood cell lineages.", location:"Red bone marrow (axial skeleton and proximal long bones in adults).", characteristics:"Rare, quiescent most of the time, low mitotic rate; asymmetric division maintains the stem cell pool.", fate:"Differentiates into myeloid or lymphoid progenitors under cytokine signaling (SCF, IL-3, TPO, and others)."},
+  id:"hsc", name:"Célula Madre Hematopoyética",
+  info:{origin:"Reside en el nicho hematopoyético de la médula ósea roja, anclada a células del estroma y al endotelio sinusoidal.", function:"Pluripotente y autorrenovable; da origen a todos los linajes de células sanguíneas.", location:"Médula ósea roja (esqueleto axial y huesos largos proximales en el adulto).", characteristics:"Poco frecuente, en su mayoría quiescente, con baja tasa mitótica; la división asimétrica mantiene la reserva de células madre.", fate:"Se diferencia en progenitores mieloides o linfoides bajo la señalización de citocinas (SCF, IL-3, TPO, entre otras)."},
   children:[
-    {id:"myeloid", name:"Myeloid Progenitor", branch:"myeloid",
-      info:{origin:"Derived from the HSC (common myeloid progenitor / CFU-GEMM).", function:"Commits to erythroid, granulocytic, monocytic, and megakaryocytic fates.", location:"Red marrow.", characteristics:"Responds to SCF, IL-3, GM-CSF.", fate:"Branches into erythroid, granulocyte/monocyte, and megakaryocyte lines."},
+    {id:"myeloid", name:"Progenitor Mieloide", branch:"myeloid",
+      info:{origin:"Deriva de la célula madre hematopoyética (progenitor mieloide común / CFU-GEMM).", function:"Se compromete hacia los destinos eritroide, granulocítico, monocítico y megacariocítico.", location:"Médula ósea roja.", characteristics:"Responde a SCF, IL-3 y GM-CSF.", fate:"Se ramifica en las líneas eritroide, granulocito/monocito y megacariocito."},
       children:[
-        {id:"ery", name:"Erythrocyte", info:{origin:"Via BFU-E → CFU-E → erythroblast stages.", function:"Carries O2 and CO2 in the blood.", location:"Peripheral blood.", characteristics:"Anucleate, biconcave, ~120-day lifespan.", fate:"Removed by splenic/hepatic macrophages at senescence."}},
-        {id:"plt", name:"Platelets", info:{origin:"Cytoplasmic fragments of the megakaryocyte.", function:"Primary hemostasis — form the platelet plug and support coagulation.", location:"Peripheral blood.", characteristics:"Anucleate, ~7-10 day lifespan.", fate:"Cleared by the spleen and reticuloendothelial system."}},
-        {id:"neu", name:"Neutrophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"First responder phagocyte against bacteria.", location:"Blood, then tissues during inflammation.", characteristics:"Multilobed nucleus, most abundant leukocyte.", fate:"Short-lived; dies at the infection site forming pus."}},
-        {id:"eos", name:"Eosinophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"Defense against parasites; modulates allergic reactions.", location:"Blood and mucosal tissues.", characteristics:"Bilobed nucleus, eosinophilic (red-orange) granules.", fate:"Migrates into tissue, degranulates against large parasites."}},
-        {id:"bas", name:"Basophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"Releases histamine and heparin in immediate hypersensitivity.", location:"Blood (least abundant granulocyte).", characteristics:"Nucleus often obscured by dense purple-blue granules.", fate:"Contributes to allergic and anti-parasitic responses."}},
-        {id:"mono", name:"Monocyte", info:{origin:"Granulocyte-monocyte progenitor.", function:"Circulating precursor of tissue macrophages and some dendritic cells.", location:"Blood, then tissues.", characteristics:"Largest leukocyte, kidney-shaped nucleus.", fate:"Differentiates into a macrophage or monocyte-derived dendritic cell."}}
+        {id:"ery", name:"Eritrocito", info:{origin:"A través de las etapas BFU-E → CFU-E → eritroblasto.", function:"Transporta O2 y CO2 en la sangre.", location:"Sangre periférica.", characteristics:"Anucleado, bicóncavo, vida media de ~120 días.", fate:"Es retirado por macrófagos esplénicos/hepáticos al llegar a la senescencia."}},
+        {id:"plt", name:"Plaquetas", info:{origin:"Fragmentos citoplasmáticos del megacariocito.", function:"Hemostasia primaria — forman el tapón plaquetario y favorecen la coagulación.", location:"Sangre periférica.", characteristics:"Anucleadas, vida media de ~7-10 días.", fate:"Son eliminadas por el bazo y el sistema reticuloendotelial."}},
+        {id:"neu", name:"Neutrófilo", info:{origin:"Progenitor granulocito-monocito.", function:"Fagocito de primera respuesta contra bacterias.", location:"Sangre, y luego tejidos durante la inflamación.", characteristics:"Núcleo multilobulado, el leucocito más abundante.", fate:"Vida corta; muere en el sitio de infección formando pus."}},
+        {id:"eos", name:"Eosinófilo", info:{origin:"Progenitor granulocito-monocito.", function:"Defensa contra parásitos multicelulares; modula reacciones alérgicas.", location:"Sangre y tejidos mucosos.", characteristics:"Núcleo bilobulado, gránulos eosinofílicos (rojo-anaranjados).", fate:"Migra al tejido y se degranula contra parásitos grandes."}},
+        {id:"bas", name:"Basófilo", info:{origin:"Progenitor granulocito-monocito.", function:"Libera histamina y heparina en la hipersensibilidad inmediata.", location:"Sangre (el granulocito menos abundante).", characteristics:"Núcleo frecuentemente oculto por gránulos densos púrpura-azulados.", fate:"Contribuye a las respuestas alérgicas y antiparasitarias."}},
+        {id:"mono", name:"Monocito", info:{origin:"Progenitor granulocito-monocito.", function:"Precursor circulante de macrófagos tisulares y de algunas células dendríticas.", location:"Sangre, y luego tejidos.", characteristics:"El leucocito más grande, núcleo arriñonado.", fate:"Se diferencia en macrófago o en célula dendrítica derivada de monocito."}}
       ]},
-    {id:"lymphoid", name:"Lymphoid Progenitor", branch:"lymphoid",
-      info:{origin:"Derived from the HSC (common lymphoid progenitor).", function:"Gives rise to the cells of adaptive immunity plus NK cells.", location:"Red marrow, with further maturation elsewhere (thymus for T cells).", characteristics:"Responds to IL-7 and related cytokines.", fate:"Branches into T, B, and NK lineages."},
+    {id:"lymphoid", name:"Progenitor Linfoide", branch:"lymphoid",
+      info:{origin:"Deriva de la célula madre hematopoyética (progenitor linfoide común).", function:"Da origen a las células de la inmunidad adaptativa además de las células NK.", location:"Médula ósea roja, con maduración adicional en otros sitios (timo para linfocitos T).", characteristics:"Responde a IL-7 y citocinas relacionadas.", fate:"Se ramifica en los linajes T, B y NK."},
       children:[
-        {id:"tcell", name:"T Lymphocyte", info:{origin:"Common lymphoid progenitor; matures in the thymus.", function:"Cell-mediated immunity — CD8+ cytotoxic killing, CD4+ helper coordination.", location:"Blood, lymph nodes, thymus (maturation).", characteristics:"Expresses a T-cell receptor plus CD4 or CD8.", fate:"Differentiates into effector or memory T cells after antigen recognition."}},
-        {id:"bcell", name:"B Lymphocyte", info:{origin:"Common lymphoid progenitor; matures in the marrow.", function:"Humoral immunity — differentiates into antibody-secreting plasma cells; also acts as an antigen-presenting cell.", location:"Blood, lymph nodes, spleen.", characteristics:"Surface immunoglobulin (B-cell receptor).", fate:"Becomes a plasma cell or memory B cell after activation."}},
-        {id:"nk", name:"NK Cell", info:{origin:"Common lymphoid progenitor.", function:"Innate cytotoxicity against virus-infected and tumor cells, without prior sensitization.", location:"Blood and tissues.", characteristics:"Large granular lymphocyte; lacks a rearranged antigen receptor.", fate:"Kills targets lacking normal MHC I display (“missing self”)."}}
+        {id:"tcell", name:"Linfocito T", info:{origin:"Progenitor linfoide común; madura en el timo.", function:"Inmunidad celular — destrucción citotóxica CD8+, coordinación auxiliar CD4+.", location:"Sangre, ganglios linfáticos, timo (maduración).", characteristics:"Expresa un receptor de célula T más CD4 o CD8.", fate:"Se diferencia en linfocitos T efectores o de memoria tras reconocer el antígeno."}},
+        {id:"bcell", name:"Linfocito B", info:{origin:"Progenitor linfoide común; madura en la médula ósea.", function:"Inmunidad humoral — se diferencia en células plasmáticas secretoras de anticuerpos; también actúa como célula presentadora de antígeno.", location:"Sangre, ganglios linfáticos, bazo.", characteristics:"Inmunoglobulina de superficie (receptor de célula B).", fate:"Se convierte en célula plasmática o linfocito B de memoria tras la activación."}},
+        {id:"nk", name:"Célula NK", info:{origin:"Progenitor linfoide común.", function:"Citotoxicidad innata contra células infectadas por virus y células tumorales, sin sensibilización previa.", location:"Sangre y tejidos.", characteristics:"Linfocito grande y granular; carece de un receptor de antígeno reordenado.", fate:"Destruye blancos que carecen de expresión normal de MHC I (“missing self”)."}}
       ]}
   ]
 };
 
 const ERY_STAGES = [
-  {id:"hsc", name:"Hematopoietic Stem Cell", size:70, nucleus:60, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Pluripotent marrow resident; not yet committed to any lineage."},
-  {id:"myprog", name:"Myeloid Progenitor", size:66, nucleus:56, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Commits toward the myeloid branch, including the erythroid fate."},
-  {id:"bfue", name:"BFU-E", size:60, nucleus:50, chroma:"open", hb:0, cyto:"#6f84a8", desc:"Burst-forming unit–erythroid. Early progenitor, responds mainly to SCF/IL-3, weakly to EPO."},
-  {id:"cfue", name:"CFU-E", size:54, nucleus:44, chroma:"open", hb:5, cyto:"#6a7fb0", desc:"Colony-forming unit–erythroid. Highly EPO-responsive; the main target of erythropoietin."},
-  {id:"proery", name:"Proerythroblast", size:50, nucleus:40, chroma:"fine", hb:8, cyto:"#4d6fc7", desc:"First morphologically recognizable erythroid precursor. Large nucleus with fine chromatin, deeply basophilic cytoplasm begins."},
-  {id:"baso", name:"Basophilic erythroblast", size:42, nucleus:32, chroma:"coarser", hb:20, cyto:"#4457b3", desc:"Smaller cell, chromatin condensing further. Cytoplasm deeply basophilic from abundant ribosomes synthesizing globin."},
-  {id:"poly", name:"Polychromatophilic erythroblast", size:34, nucleus:22, chroma:"clumped", hb:50, cyto:"#8a6f9e", desc:"Cytoplasm turns mixed blue-pink as hemoglobin accumulates alongside residual ribosomes."},
-  {id:"ortho", name:"Orthochromatic erythroblast", size:26, nucleus:12, chroma:"pyknotic", hb:80, cyto:"#c96a7a", desc:"Small pyknotic nucleus, eosinophilic (pink) cytoplasm dominated by hemoglobin. Final stage before nuclear expulsion."},
-  {id:"retic", name:"Reticulocyte", size:22, nucleus:0, chroma:"none", hb:95, cyto:"#d9727a", desc:"Enucleated. Residual ribosomal RNA (visible as a reticulum with supravital stain) still allows some hemoglobin synthesis. Matures in the blood over 1–2 days."},
-  {id:"mature", name:"Erythrocyte", size:20, nucleus:0, chroma:"none", hb:100, cyto:"#e0505a", desc:"Mature biconcave, anucleate erythrocyte, fully loaded with hemoglobin. Circulates for about 120 days."}
+  {id:"hsc", name:"Célula Madre Hematopoyética", size:70, nucleus:60, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Residente pluripotente de la médula; aún no comprometida con ningún linaje."},
+  {id:"myprog", name:"Progenitor Mieloide", size:66, nucleus:56, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Se compromete hacia la rama mieloide, incluyendo el destino eritroide."},
+  {id:"bfue", name:"BFU-E", size:60, nucleus:50, chroma:"open", hb:0, cyto:"#6f84a8", desc:"Unidad formadora de brote eritroide. Progenitor temprano, responde principalmente a SCF/IL-3, débilmente a EPO."},
+  {id:"cfue", name:"CFU-E", size:54, nucleus:44, chroma:"open", hb:5, cyto:"#6a7fb0", desc:"Unidad formadora de colonias eritroides. Muy sensible a EPO; el principal blanco de la eritropoyetina."},
+  {id:"proery", name:"Proeritroblasto", size:50, nucleus:40, chroma:"fine", hb:8, cyto:"#4d6fc7", desc:"Primer precursor eritroide morfológicamente reconocible. Núcleo grande con cromatina fina; comienza el citoplasma profundamente basófilo."},
+  {id:"baso", name:"Eritroblasto basófilo", size:42, nucleus:32, chroma:"coarser", hb:20, cyto:"#4457b3", desc:"Célula más pequeña, la cromatina sigue condensándose. Citoplasma profundamente basófilo por la abundancia de ribosomas que sintetizan globina."},
+  {id:"poly", name:"Eritroblasto policromatófilo", size:34, nucleus:22, chroma:"clumped", hb:50, cyto:"#8a6f9e", desc:"El citoplasma se torna azul-rosado mixto conforme se acumula hemoglobina junto a ribosomas residuales."},
+  {id:"ortho", name:"Eritroblasto ortocromático", size:26, nucleus:12, chroma:"pyknotic", hb:80, cyto:"#c96a7a", desc:"Núcleo pequeño y picnótico, citoplasma eosinofílico (rosado) dominado por hemoglobina. Última etapa antes de la expulsión nuclear."},
+  {id:"retic", name:"Reticulocito", size:22, nucleus:0, chroma:"none", hb:95, cyto:"#d9727a", desc:"Enucleado. El ARN ribosómico residual (visible como retículo con tinción supravital) aún permite algo de síntesis de hemoglobina. Madura en la sangre en 1–2 días."},
+  {id:"mature", name:"Eritrocito", size:20, nucleus:0, chroma:"none", hb:100, cyto:"#e0505a", desc:"Eritrocito maduro, bicóncavo y anucleado, completamente cargado de hemoglobina. Circula durante aproximadamente 120 días."}
 ];
 
 const WBC_TYPES = [
-  {id:"neu", name:"Neutrophil", color:"var(--wbc)", nucleus:"multilobed", granule:"#e7ecf2",
-   morphology:"Multilobed nucleus (3-5 lobes), fine neutral (lilac) granules.",
-   func:"First-responder phagocyte; engulfs and kills bacteria via oxidative burst and granule enzymes.",
-   role:"Most abundant circulating leukocyte (~50-70% of the differential); central to acute inflammation.",
-   fate:"Short-lived (hours to ~1-2 days); dies at the site of infection, contributing to pus.",
-   clinical:"Neutrophilia is a classic marker of acute bacterial infection."},
-  {id:"eos", name:"Eosinophil", color:"#e07a3f", nucleus:"bilobed", granule:"#e07a3f",
-   morphology:"Bilobed nucleus, large eosinophilic (red-orange) granules.",
-   func:"Defends against multicellular parasites; releases major basic protein; modulates allergic/hypersensitivity reactions.",
-   role:"Minor fraction of leukocytes; expands during parasitic infection or allergy.",
-   fate:"Migrates into mucosal tissues; degranulates on contact with large pathogens.",
-   clinical:"Eosinophilia suggests parasitic infection, asthma, or allergic disease."},
-  {id:"bas", name:"Basophil", color:"#7a5fc9", nucleus:"obscured", granule:"#7a5fc9",
-   morphology:"Nucleus often obscured by dense, coarse purple-blue granules.",
-   func:"Releases histamine and heparin; participates in immediate (type I) hypersensitivity.",
-   role:"Least abundant granulocyte in blood; tissue counterpart is the mast cell.",
-   fate:"Degranulates rapidly upon IgE cross-linking.",
-   clinical:"Central mediator of allergic and anaphylactic reactions."},
-  {id:"lym", name:"Lymphocyte", color:"var(--immune)", nucleus:"round-large", granule:"none",
-   morphology:"Large round nucleus, scant cytoplasm rim.",
-   func:"T cells mediate cellular immunity; B cells produce antibodies; NK cells provide innate cytotoxicity.",
-   role:"Second most abundant leukocyte; the core of adaptive immunity.",
-   fate:"Long-lived; memory subsets can persist for years.",
-   clinical:"Lymphocytosis is typical of viral infections; lymphopenia can reflect immunosuppression."},
-  {id:"mon", name:"Monocyte", color:"var(--mono-c)", nucleus:"kidney-shaped", granule:"none",
-   morphology:"Largest leukocyte; kidney/horseshoe-shaped nucleus, abundant gray-blue cytoplasm.",
-   func:"Circulating precursor that becomes a tissue macrophage or dendritic cell.",
-   role:"Bridges innate phagocytic defense and antigen presentation to adaptive immunity.",
-   fate:"Leaves the blood within 1-3 days to seed tissues.",
-   clinical:"Monocytosis can be seen in chronic infection and some hematologic disorders."}
+  {id:"neu", name:"Neutrófilo", color:"var(--wbc)", nucleus:"multilobed", granule:"#e7ecf2",
+   morphology:"Núcleo multilobulado (3-5 lóbulos), gránulos finos y neutros (lilas).",
+   func:"Fagocito de primera respuesta; engulle y destruye bacterias mediante estallido oxidativo y enzimas granulares.",
+   role:"El leucocito circulante más abundante (~50-70% del diferencial); central en la inflamación aguda.",
+   fate:"Vida corta (horas a ~1-2 días); muere en el sitio de infección, contribuyendo a la formación de pus.",
+   clinical:"La neutrofilia es un marcador clásico de infección bacteriana aguda."},
+  {id:"eos", name:"Eosinófilo", color:"#e07a3f", nucleus:"bilobed", granule:"#e07a3f",
+   morphology:"Núcleo bilobulado, gránulos eosinofílicos grandes (rojo-anaranjados).",
+   func:"Defiende contra parásitos multicelulares; libera la proteína básica mayor; modula reacciones alérgicas/de hipersensibilidad.",
+   role:"Fracción minoritaria de los leucocitos; aumenta durante infección parasitaria o alergia.",
+   fate:"Migra hacia tejidos mucosos; se degranula al contacto con parásitos grandes.",
+   clinical:"La eosinofilia sugiere infección parasitaria, asma o enfermedad alérgica."},
+  {id:"bas", name:"Basófilo", color:"#7a5fc9", nucleus:"obscured", granule:"#7a5fc9",
+   morphology:"Núcleo frecuentemente oculto por gránulos densos y gruesos púrpura-azulados.",
+   func:"Libera histamina y heparina; participa en la hipersensibilidad inmediata (tipo I).",
+   role:"El granulocito menos abundante en sangre; su contraparte tisular es el mastocito.",
+   fate:"Se degranula rápidamente tras el entrecruzamiento de IgE.",
+   clinical:"Mediador central de las reacciones alérgicas y anafilácticas."},
+  {id:"lym", name:"Linfocito", color:"var(--immune)", nucleus:"round-large", granule:"none",
+   morphology:"Núcleo grande y redondo, delgado borde de citoplasma.",
+   func:"Los linfocitos T median la inmunidad celular; los B producen anticuerpos; las NK aportan citotoxicidad innata.",
+   role:"El segundo leucocito más abundante; el núcleo de la inmunidad adaptativa.",
+   fate:"Vida larga; los subtipos de memoria pueden persistir por años.",
+   clinical:"La linfocitosis es típica de infecciones virales; la linfopenia puede reflejar inmunosupresión."},
+  {id:"mon", name:"Monocito", color:"var(--mono-c)", nucleus:"kidney-shaped", granule:"none",
+   morphology:"El leucocito más grande; núcleo arriñonado/en herradura, abundante citoplasma gris-azulado.",
+   func:"Precursor circulante que se convierte en macrófago tisular o célula dendrítica.",
+   role:"Conecta la defensa fagocítica innata con la presentación de antígeno a la inmunidad adaptativa.",
+   fate:"Abandona la sangre en 1-3 días para poblar los tejidos.",
+   clinical:"La monocitosis puede observarse en infección crónica y algunos trastornos hematológicos."}
 ];
 
 const EXTRAV_STAGES = [
-  {id:"margin", name:"Margination", desc:"Altered blood flow and endothelial activation cause leukocytes to shift from the axial stream to the vessel wall.", tag:null},
-  {id:"roll", name:"Rolling", desc:"Selectins (E-/P-selectin on endothelium, sialyl-Lewis X on the leukocyte) form weak, transient bonds — the leukocyte rolls along the wall.", tag:"Selectins"},
-  {id:"activate", name:"Activation", desc:"Endothelium-displayed chemokines trigger inside-out signaling that switches leukocyte integrins to a high-affinity state.", tag:null},
-  {id:"adhere", name:"Adhesion", desc:"High-affinity integrins (LFA-1, VLA-4) bind ICAM-1/VCAM-1 on the endothelium, producing firm arrest.", tag:"Integrins"},
-  {id:"diapedesis", name:"Diapedesis", desc:"The leukocyte squeezes between endothelial cell junctions (PECAM-1/CD31 mediated) into the tissue.", tag:null},
-  {id:"chemotaxis", name:"Chemotaxis", desc:"The leukocyte migrates directionally along a chemokine/chemoattractant gradient toward the site of infection or injury.", tag:null}
+  {id:"margin", name:"Marginación", desc:"El flujo sanguíneo alterado y la activación endotelial hacen que los leucocitos se desplacen del flujo axial hacia la pared del vaso.", tag:null},
+  {id:"roll", name:"Rodamiento", desc:"Las selectinas (E-/P-selectina en el endotelio, sialil-Lewis X en el leucocito) forman uniones débiles y transitorias — el leucocito rueda sobre la pared.", tag:"Selectinas"},
+  {id:"activate", name:"Activación", desc:"Las quimiocinas expuestas en el endotelio activan una señalización de dentro hacia afuera que cambia las integrinas del leucocito a un estado de alta afinidad.", tag:null},
+  {id:"adhere", name:"Adhesión", desc:"Las integrinas de alta afinidad (LFA-1, VLA-4) se unen a ICAM-1/VCAM-1 en el endotelio, produciendo un arresto firme.", tag:"Integrinas"},
+  {id:"diapedesis", name:"Diapédesis", desc:"El leucocito se desliza entre las uniones de las células endoteliales (mediado por PECAM-1/CD31) hacia el tejido.", tag:null},
+  {id:"chemotaxis", name:"Quimiotaxis", desc:"El leucocito migra direccionalmente siguiendo un gradiente de quimiocinas/quimioatrayentes hacia el sitio de infección o lesión.", tag:null}
 ];
 
 const MONO_STAGES = [
-  {id:"blood", name:"Monocyte in blood", desc:"Circulates for 1–3 days as a surveillance phagocyte, ready to respond to inflammatory signals."},
-  {id:"migrate", name:"Endothelial migration", desc:"Follows the same rolling → adhesion → diapedesis sequence as other leukocytes to enter tissue."},
-  {id:"tissue", name:"Tissue", desc:"Once in the tissue, the monocyte encounters local cytokines and microbial signals that direct its differentiation."},
-  {id:"macro", name:"Macrophage / dendritic cell", desc:"Differentiates into a resident-type macrophage (or monocyte-derived dendritic cell), taking on phagocytic and antigen-presenting roles."}
+  {id:"blood", name:"Monocito en sangre", desc:"Circula durante 1–3 días como fagocito de vigilancia, listo para responder a señales inflamatorias."},
+  {id:"migrate", name:"Migración endotelial", desc:"Sigue la misma secuencia de rodamiento → adhesión → diapédesis que otros leucocitos para entrar al tejido."},
+  {id:"tissue", name:"Tejido", desc:"Una vez en el tejido, el monocito encuentra citocinas locales y señales microbianas que dirigen su diferenciación."},
+  {id:"macro", name:"Macrófago / célula dendrítica", desc:"Se diferencia en un macrófago de tipo residente (o en una célula dendrítica derivada de monocito), asumiendo funciones fagocíticas y de presentación de antígeno."}
 ];
 
 const APC_TYPES = [
-  {id:"dc", name:"Dendritic Cell", role:"The most potent professional APC; captures antigen in peripheral tissue and migrates to lymph nodes to activate naive T cells.", mhc:"MHC I and II; uniquely capable of cross-presentation."},
-  {id:"mac", name:"Macrophage", role:"Phagocytoses pathogens and debris; presents processed peptides mainly to already-differentiated effector/memory T cells locally.", mhc:"MHC I and II."},
-  {id:"bc", name:"B Lymphocyte", role:"Captures antigen via its B-cell receptor with high specificity; presents to helper T cells to obtain the T-cell help needed for antibody class switching.", mhc:"MHC I and II."}
+  {id:"dc", name:"Célula Dendrítica", role:"La CPA profesional más potente; captura antígeno en el tejido periférico y migra a los ganglios linfáticos para activar linfocitos T vírgenes.", mhc:"MHC I y II; capacidad única de presentación cruzada."},
+  {id:"mac", name:"Macrófago", role:"Fagocita patógenos y detritos; presenta péptidos procesados principalmente a linfocitos T efectores/de memoria ya diferenciados, de forma local.", mhc:"MHC I y II."},
+  {id:"bc", name:"Linfocito B", role:"Captura antígeno mediante su receptor de célula B con alta especificidad; lo presenta a linfocitos T colaboradores para obtener la ayuda necesaria para el cambio de clase de anticuerpos.", mhc:"MHC I y II."}
 ];
 
 const MHC_SCENARIOS = [
-  {id:1, desc:"A viral protein is synthesized in the cytoplasm of an infected epithelial cell.", correct:"I", explain:"Endogenous/cytosolic proteins are degraded by the proteasome, transported by TAP into the ER, and loaded onto MHC I for CD8+ cytotoxic T cell surveillance."},
-  {id:2, desc:"An extracellular bacterium is phagocytosed by a macrophage.", correct:"II", explain:"Exogenous antigens captured by phagocytosis are degraded in the endolysosomal pathway and loaded onto MHC II for CD4+ helper T cells."},
-  {id:3, desc:"A self-protein is degraded during normal intracellular turnover.", correct:"I", explain:"MHC I continuously displays a sample of intracellular (mostly self) proteins on virtually all nucleated cells, allowing immune surveillance for anything abnormal."},
-  {id:4, desc:"A tumor antigen is synthesized inside a cancer cell.", correct:"I", explain:"Being an endogenous/cytosolic protein, it follows the proteasome/TAP/MHC I route, allowing CD8+ T cells to recognize and kill the tumor cell."},
-  {id:5, desc:"A toxin is taken up by receptor-mediated endocytosis into a dendritic cell.", correct:"II", explain:"Endocytosed extracellular material is processed in endosomes/lysosomes and presented via MHC II to CD4+ T cells."},
-  {id:6, desc:"[Advanced] A dendritic cell captures a viral antigen from dying infected cells and cross-presents it.", correct:"I", explain:"Cross-presentation is the exception: dendritic cells can route exogenous antigen onto MHC I, activating CD8+ T cells even when the DC itself was never infected."}
+  {id:1, desc:"Una proteína viral se sintetiza en el citoplasma de una célula epitelial infectada.", correct:"I", explain:"Las proteínas endógenas/citosólicas son degradadas por el proteasoma, transportadas por TAP hacia el retículo endoplásmico, y cargadas en MHC I para la vigilancia de linfocitos T citotóxicos CD8+."},
+  {id:2, desc:"Una bacteria extracelular es fagocitada por un macrófago.", correct:"II", explain:"Los antígenos exógenos capturados por fagocitosis se degradan en la vía endolisosómica y se cargan en MHC II para linfocitos T colaboradores CD4+."},
+  {id:3, desc:"Una proteína propia se degrada durante el recambio intracelular normal.", correct:"I", explain:"El MHC I exhibe continuamente una muestra de proteínas intracelulares (mayormente propias) en prácticamente todas las células nucleadas, permitiendo la vigilancia inmunitaria ante cualquier anomalía."},
+  {id:4, desc:"Un antígeno tumoral se sintetiza dentro de una célula cancerosa.", correct:"I", explain:"Al ser una proteína endógena/citosólica, sigue la vía proteasoma/TAP/MHC I, permitiendo que los linfocitos T CD8+ reconozcan y destruyan la célula tumoral."},
+  {id:5, desc:"Una toxina es captada por endocitosis mediada por receptor en una célula dendrítica.", correct:"II", explain:"El material extracelular endocitado se procesa en endosomas/lisosomas y se presenta vía MHC II a linfocitos T CD4+."},
+  {id:6, desc:"[Avanzado] Una célula dendrítica captura un antígeno viral de células infectadas moribundas y lo presenta de forma cruzada.", correct:"I", explain:"La presentación cruzada es la excepción: las células dendríticas pueden dirigir antígeno exógeno hacia el MHC I, activando linfocitos T CD8+ incluso cuando la célula dendrítica nunca fue infectada."}
 ];
 
 const INNATE_ADAPTIVE_STAGES = [
-  {id:"pathogen", name:"Pathogen", desc:"A pathogen breaches a peripheral tissue barrier."},
-  {id:"dc", name:"Dendritic Cell", desc:"A resident dendritic cell, an innate sentinel, encounters the pathogen."},
-  {id:"capture", name:"Antigen Capture", desc:"The dendritic cell captures and processes the antigen, then matures — upregulating MHC and costimulatory molecules (CD80/86)."},
-  {id:"node", name:"Lymph Node", desc:"The mature dendritic cell migrates via lymphatics to the regional lymph node."},
-  {id:"present", name:"Antigen Presentation", desc:"It presents processed peptide via MHC I or II to circulating naive T cells."},
-  {id:"activation", name:"T Cell Activation", desc:"TCR recognition plus costimulation activates and clonally expands the specific T cell."},
-  {id:"adaptive", name:"Adaptive Immunity", desc:"Effector T cells and B-cell help drive a targeted adaptive response — the dendritic cell has bridged innate and adaptive immunity."}
+  {id:"pathogen", name:"Patógeno", desc:"Un patógeno atraviesa una barrera tisular periférica."},
+  {id:"dc", name:"Célula Dendrítica", desc:"Una célula dendrítica residente, centinela de la inmunidad innata, encuentra al patógeno."},
+  {id:"capture", name:"Captura del Antígeno", desc:"La célula dendrítica captura y procesa el antígeno, y luego madura — aumentando MHC y moléculas coestimuladoras (CD80/86)."},
+  {id:"node", name:"Ganglio Linfático", desc:"La célula dendrítica madura migra por vía linfática hacia el ganglio linfático regional."},
+  {id:"present", name:"Presentación del Antígeno", desc:"Presenta el péptido procesado vía MHC I o II a linfocitos T vírgenes circulantes."},
+  {id:"activation", name:"Activación de la Célula T", desc:"El reconocimiento por el receptor de célula T (TCR) más la coestimulación activa y expande clonalmente al linfocito T específico."},
+  {id:"adaptive", name:"Inmunidad Adaptativa", desc:"Los linfocitos T efectores y la ayuda a linfocitos B impulsan una respuesta adaptativa dirigida — la célula dendrítica ha conectado la inmunidad innata con la adaptativa."}
 ];
 
 const CLINICAL_CASES = [
   {id:"c1", type:"mcq",
-   vignette:"A 45-year-old climbs to a 4500 m altitude camp and develops mild dyspnea. Pulse oximetry reads 88%.",
-   question:"What happens to EPO production?",
-   options:["EPO decreases","EPO increases","EPO does not change"], correct:1,
-   explain:"Tissue hypoxia stimulates peritubular renal cells (via the HIF pathway) to increase erythropoietin synthesis, raising the erythroid stimulus."},
+   vignette:"Un paciente de 45 años sube a un campamento a 4500 m de altitud y presenta disnea leve. La oximetría de pulso marca 88%.",
+   question:"¿Qué ocurre con la producción de EPO?",
+   options:["La EPO disminuye","La EPO aumenta","La EPO no cambia"], correct:1,
+   explain:"La hipoxia tisular estimula a las células peritubulares renales (vía HIF) para aumentar la síntesis de eritropoyetina, incrementando el estímulo eritroide."},
   {id:"c2", type:"mcq",
-   vignette:"A patient has advanced chronic kidney disease (eGFR 15 mL/min).",
-   question:"How is erythropoiesis affected?",
-   options:["It increases from greater EPO filtration","It decreases from reduced renal EPO synthesis","It is unaffected","It increases from iron retention"], correct:1,
-   explain:"Damaged renal parenchyma produces less EPO, lowering the erythroid stimulus — the mechanism behind the anemia of chronic kidney disease."},
+   vignette:"Un paciente presenta enfermedad renal crónica avanzada (TFG 15 mL/min).",
+   question:"¿Cómo se afecta la eritropoyesis?",
+   options:["Aumenta por mayor filtración de EPO","Disminuye por menor síntesis renal de EPO","No se afecta","Aumenta por retención de hierro"], correct:1,
+   explain:"El parénquima renal dañado produce menos EPO, disminuyendo el estímulo eritroide — el mecanismo detrás de la anemia de la enfermedad renal crónica."},
   {id:"c3", type:"order",
-   vignette:"A neutrophil must leave the bloodstream to reach a focus of infection.",
-   question:"Arrange these events in the correct order.",
-   items:["Rolling","Adhesion","Diapedesis","Chemotaxis"], correctOrder:[0,1,2,3],
-   explain:"Full sequence: margination → rolling (selectins) → activation → adhesion (integrins) → diapedesis → chemotaxis toward the chemokine gradient."},
+   vignette:"Un neutrófilo debe abandonar el torrente sanguíneo para llegar a un foco de infección.",
+   question:"Ordena estos eventos en la secuencia correcta.",
+   items:["Rodamiento","Adhesión","Diapédesis","Quimiotaxis"], correctOrder:[0,1,2,3],
+   explain:"Secuencia completa: marginación → rodamiento (selectinas) → activación → adhesión (integrinas) → diapédesis → quimiotaxis hacia el gradiente de quimiocinas."},
   {id:"c4", type:"mcq",
-   vignette:"A dendritic cell captures an extracellular bacterium and presents a derived peptide bound to MHC II on its surface.",
-   question:"Which lymphocyte mainly recognizes this presentation?",
-   options:["CD4+ T lymphocyte","CD8+ T lymphocyte"], correct:0,
-   explain:"MHC II is recognized by CD4+ helper T cells, consistent with the exogenous/phagocytic route of antigen processing."}
+   vignette:"Una célula dendrítica captura una bacteria extracelular y presenta un péptido derivado de ella unido a MHC II en su superficie.",
+   question:"¿Qué linfocito reconoce principalmente esta presentación?",
+   options:["Linfocito T CD4+","Linfocito T CD8+"], correct:0,
+   explain:"El MHC II es reconocido por linfocitos T colaboradores CD4+, consistente con la vía exógena/fagocítica de procesamiento del antígeno."}
 ];
 
 const QUESTION_BANK = [
-  {tag:"marrow", stem:"What is the approximate cellular composition of red bone marrow?", options:["95% adipocytes / 5% hematopoietic cells","60% hematopoietic cells / 40% adipocytes","80% water / 20% protein","100% hematopoietic cells"], correct:1, explain:"Red marrow is about 60% hematopoietic cells and 40% adipocytes (Londoño et al., 2015)."},
-  {tag:"marrow", stem:"What is the approximate chemical composition of yellow marrow?", options:["40% fat / 40% water / 20% protein","80% fat / 15% water / 5% protein","20% fat / 60% water / 20% protein","100% fat"], correct:1, explain:"Yellow marrow is chemically about 80% fat, 15% water, and 5% protein."},
-  {tag:"marrow", stem:"On T1-weighted MRI, yellow (fatty) marrow signal is:", options:["Low, similar to muscle","High, similar to subcutaneous fat","Absent","Identical to water"], correct:1, explain:"Fat's short T1 relaxation time gives yellow marrow high T1 signal, resembling subcutaneous fat."},
-  {tag:"marrow", stem:"What does a STIR sequence accomplish?", options:["Enhances contrast with gadolinium","Suppresses fat signal","Eliminates water signal","Increases cortical bone signal"], correct:1, explain:"STIR (Short TI Inversion Recovery) nulls the fat signal, making red marrow relatively more conspicuous."},
-  {tag:"marrow", stem:"In an adult (>25 years), where does red marrow predominate?", options:["Diaphyses of the limb long bones","Axial skeleton, sternum, ribs, and proximal femur/humerus","Phalanges of the hands/feet","Exclusively the skull"], correct:1, explain:"The adult pattern retains red marrow in the axial skeleton, sternum, ribs, and the proximal femur and humerus."},
-  {tag:"marrow", stem:"Around what age is the adult marrow distribution pattern typically reached?", options:["5 years","10 years","25 years","60 years"], correct:2, explain:"The adult marrow pattern is generally reached by about 25 years of age."},
-  {tag:"eryth", stem:"Which is the first morphologically recognizable erythroid precursor?", options:["BFU-E","CFU-E","Proerythroblast","Reticulocyte"], correct:2, explain:"The proerythroblast is the first stage identifiable by standard morphology in the erythroid line."},
-  {tag:"eryth", stem:"Between which two stages does enucleation occur?", options:["Proerythroblast → basophilic erythroblast","Orthochromatic erythroblast → reticulocyte","Reticulocyte → erythrocyte","BFU-E → CFU-E"], correct:1, explain:"The orthochromatic erythroblast expels its pyknotic nucleus to become a reticulocyte."},
-  {tag:"eryth", stem:"Which erythroid progenitor is most sensitive to EPO?", options:["BFU-E","CFU-E","Proerythroblast","HSC"], correct:1, explain:"CFU-E is the main EPO-responsive target, more so than the earlier BFU-E."},
-  {tag:"eryth", stem:"What happens to EPO during tissue hypoxia?", options:["It decreases","It increases","No change","It is destroyed"], correct:1, explain:"Hypoxia upregulates renal EPO synthesis via the HIF pathway, stimulating erythropoiesis."},
-  {tag:"eryth", stem:"A marked drop in renal function typically causes:", options:["Increased EPO and erythropoiesis","Decreased EPO and erythropoiesis (anemia of CKD)","No change in erythropoiesis","Isolated iron deficiency"], correct:1, explain:"Reduced renal mass/function lowers EPO synthesis, producing the characteristic anemia of chronic kidney disease."},
-  {tag:"eryth", stem:"Which feature best describes a reticulocyte?", options:["Fully mature, no residual RNA","Anucleate with residual ribosomal RNA, matures in 1-2 days in blood","Still nucleated","Found only in marrow, never in blood"], correct:1, explain:"Reticulocytes are enucleated but retain ribosomal RNA (the “reticulum”), maturing in the peripheral blood over 1-2 days."},
-  {tag:"rbc", stem:"What is the average lifespan of a mature erythrocyte?", options:["30 days","120 days","1 year","10 days"], correct:1, explain:"Mature erythrocytes circulate for approximately 120 days before removal."},
-  {tag:"rbc", stem:"Where are senescent erythrocytes mainly removed?", options:["Kidney","Spleen and liver (macrophages)","Lungs","Bone marrow only"], correct:1, explain:"Splenic and hepatic macrophages phagocytose aged erythrocytes and recycle their iron."},
-  {tag:"rbc", stem:"The biconcave shape of the erythrocyte mainly serves to:", options:["Increase surface area and deformability for gas exchange","Store oxygen reserves","Anchor the nucleus","Increase rigidity"], correct:0, explain:"The biconcave disc increases surface-to-volume ratio and allows the deformability needed to traverse capillaries."},
-  {tag:"rbc", stem:"A rise in CO2 / fall in pH shifts the oxyhemoglobin curve:", options:["Left, increasing O2 affinity","Right, decreasing O2 affinity (Bohr effect)","It has no effect","It abolishes cooperative binding"], correct:1, explain:"The Bohr effect: more CO2/lower pH shifts the curve right, favoring O2 release to metabolically active tissue."},
-  {tag:"rbc", stem:"Where does the carbonic anhydrase reaction (CO2 + H2O ↔ H2CO3) mainly occur?", options:["In plasma","Inside the erythrocyte","In the alveolar epithelium","In the renal tubule only"], correct:1, explain:"Carbonic anhydrase is abundant inside the erythrocyte, rapidly converting CO2 and water to carbonic acid."},
-  {tag:"rbc", stem:"In the chloride shift, as HCO3⁻ leaves the erythrocyte for plasma:", options:["Na+ enters to balance charge","Cl⁻ enters via the band 3 exchanger","K+ leaves the cell","Nothing else moves"], correct:1, explain:"The band 3 (AE1) anion exchanger swaps outgoing HCO3⁻ for incoming Cl⁻, preserving electroneutrality."},
-  {tag:"wbc", stem:"Which is the most abundant circulating leukocyte?", options:["Eosinophil","Basophil","Neutrophil","Monocyte"], correct:2, explain:"Neutrophils make up roughly 50-70% of the normal leukocyte differential."},
-  {tag:"wbc", stem:"A bilobed nucleus with red-orange granules, active against parasites, describes the:", options:["Neutrophil","Eosinophil","Basophil","Lymphocyte"], correct:1, explain:"Eosinophils have a characteristic bilobed nucleus and eosinophilic granules, and target large parasites."},
-  {tag:"wbc", stem:"Selectins mediate which step of extravasation?", options:["Firm adhesion","Rolling","Diapedesis","Chemotaxis"], correct:1, explain:"Selectin-mediated bonds are weak and transient, producing rolling along the endothelium."},
-  {tag:"wbc", stem:"Integrins mediate which step of extravasation?", options:["Rolling","Firm adhesion (arrest)","Margination only","None of the above"], correct:1, explain:"High-affinity integrins (LFA-1, VLA-4) bind endothelial ICAM-1/VCAM-1 to produce firm arrest."},
-  {tag:"wbc", stem:"PECAM-1/CD31 is most closely associated with:", options:["Rolling","Diapedesis (transmigration)","Chemotaxis","Margination"], correct:1, explain:"PECAM-1 interactions at endothelial junctions help the leukocyte squeeze through into the tissue."},
-  {tag:"mono", stem:"In tissue, a monocyte typically differentiates into a:", options:["Neutrophil","Macrophage (or monocyte-derived dendritic cell)","Lymphocyte","Erythrocyte"], correct:1, explain:"Once in tissue, monocytes differentiate into macrophages or, in some contexts, dendritic cells."},
-  {tag:"mono", stem:"Which is NOT a typical macrophage function?", options:["Phagocytosis of debris","Cytokine production","Antibody secretion","Antigen presentation"], correct:2, explain:"Antibody secretion is a function of plasma cells (differentiated B lymphocytes), not macrophages."},
-  {tag:"mono", stem:"Which cytokines are classically produced by activated monocytes/macrophages?", options:["TNF-α, IL-1, IL-6","Insulin, glucagon","Erythropoietin, thrombopoietin","Only IgG"], correct:0, explain:"TNF-α, IL-1, and IL-6 are hallmark pro-inflammatory cytokines released by activated monocytes/macrophages."},
-  {tag:"apc", stem:"MHC class I molecules primarily present antigen to:", options:["CD4+ T cells","CD8+ T cells","B cells","NK cells"], correct:1, explain:"MHC I presents endogenous peptides to CD8+ cytotoxic T cells."},
-  {tag:"apc", stem:"MHC class II molecules primarily present antigen to:", options:["CD8+ T cells","CD4+ T cells","Neutrophils","Erythrocytes"], correct:1, explain:"MHC II presents exogenous/phagocytosed peptides to CD4+ helper T cells."},
-  {tag:"apc", stem:"An extracellular bacterium phagocytosed by a macrophage is processed and presented via:", options:["MHC I only","MHC II","Neither pathway","Direct membrane fusion, no MHC"], correct:1, explain:"Phagocytosed extracellular material follows the exogenous route to MHC II."},
-  {tag:"apc", stem:"A viral protein made in the cytoplasm of an infected cell is presented via:", options:["MHC I (endogenous/proteasome/TAP route)","MHC II only","Neither pathway","Only by dendritic cells"], correct:0, explain:"Cytosolic proteins are degraded by the proteasome, transported via TAP, and loaded onto MHC I."},
-  {tag:"apc", stem:"Cross-presentation refers to:", options:["B cells presenting to T cells","Dendritic cells presenting exogenous antigen via MHC I to CD8+ T cells","MHC I presenting only self-peptides","Macrophages ignoring phagocytosed antigen"], correct:1, explain:"Cross-presentation is the specialized dendritic-cell capability of routing exogenous antigen onto MHC I."},
-  {tag:"apc", stem:"Which cells express MHC class I?", options:["Only professional APCs","Only B cells","Virtually all nucleated cells","Only red blood cells"], correct:2, explain:"MHC I is expressed on nearly all nucleated cells, unlike MHC II which is restricted mainly to professional APCs."}
+  {tag:"marrow", stem:"¿Cuál es la composición celular aproximada de la médula ósea roja?", options:["95% adipocitos / 5% células hematopoyéticas","60% células hematopoyéticas / 40% adipocitos","80% agua / 20% proteínas","100% células hematopoyéticas"], correct:1, explain:"La médula roja es aproximadamente 60% células hematopoyéticas y 40% adipocitos (Londoño et al., 2015)."},
+  {tag:"marrow", stem:"¿Cuál es la composición química aproximada de la médula amarilla?", options:["40% grasa / 40% agua / 20% proteínas","80% grasa / 15% agua / 5% proteínas","20% grasa / 60% agua / 20% proteínas","100% grasa"], correct:1, explain:"Químicamente, la médula amarilla es aproximadamente 80% grasa, 15% agua y 5% proteínas."},
+  {tag:"marrow", stem:"En una RM potenciada en T1, la señal de la médula amarilla (grasa) es:", options:["Baja, similar al músculo","Alta, similar a la grasa subcutánea","Ausente","Idéntica a la del agua"], correct:1, explain:"El T1 corto de la grasa le da a la médula amarilla señal alta en T1, similar a la grasa subcutánea."},
+  {tag:"marrow", stem:"¿Qué logra una secuencia STIR?", options:["Aumenta el contraste con gadolinio","Suprime la señal de la grasa","Elimina la señal del agua","Aumenta la señal del hueso cortical"], correct:1, explain:"STIR (Short TI Inversion Recovery) anula la señal de la grasa, haciendo que la médula roja sea relativamente más visible."},
+  {tag:"marrow", stem:"En un adulto (>25 años), ¿dónde predomina la médula ósea roja?", options:["Diáfisis de los huesos largos de las extremidades","Esqueleto axial, esternón, costillas y fémur/húmero proximales","Falanges de manos y pies","Exclusivamente el cráneo"], correct:1, explain:"El patrón adulto conserva médula roja en el esqueleto axial, esternón, costillas y el fémur y húmero proximales."},
+  {tag:"marrow", stem:"¿Alrededor de qué edad se alcanza típicamente el patrón adulto de distribución medular?", options:["5 años","10 años","25 años","60 años"], correct:2, explain:"El patrón medular adulto generalmente se alcanza hacia los 25 años de edad."},
+  {tag:"eryth", stem:"¿Cuál es el primer precursor eritroide morfológicamente reconocible?", options:["BFU-E","CFU-E","Proeritroblasto","Reticulocito"], correct:2, explain:"El proeritroblasto es la primera etapa identificable por morfología estándar en la línea eritroide."},
+  {tag:"eryth", stem:"¿Entre qué dos etapas ocurre la enucleación?", options:["Proeritroblasto → eritroblasto basófilo","Eritroblasto ortocromático → reticulocito","Reticulocito → eritrocito","BFU-E → CFU-E"], correct:1, explain:"El eritroblasto ortocromático expulsa su núcleo picnótico para convertirse en reticulocito."},
+  {tag:"eryth", stem:"¿Qué progenitor eritroide es más sensible a la EPO?", options:["BFU-E","CFU-E","Proeritroblasto","Célula madre hematopoyética"], correct:1, explain:"El CFU-E es el principal blanco de la EPO, más que el BFU-E, que es más temprano."},
+  {tag:"eryth", stem:"¿Qué le ocurre a la EPO durante la hipoxia tisular?", options:["Disminuye","Aumenta","No cambia","Se destruye"], correct:1, explain:"La hipoxia incrementa la síntesis renal de EPO vía la vía de HIF, estimulando la eritropoyesis."},
+  {tag:"eryth", stem:"Una disminución marcada de la función renal típicamente causa:", options:["Aumento de EPO y eritropoyesis","Disminución de EPO y eritropoyesis (anemia de la ERC)","Ningún cambio en la eritropoyesis","Deficiencia aislada de hierro"], correct:1, explain:"La menor masa/función renal reduce la síntesis de EPO, produciendo la anemia característica de la enfermedad renal crónica."},
+  {tag:"eryth", stem:"¿Qué característica describe mejor a un reticulocito?", options:["Totalmente maduro, sin ARN residual","Anucleado con ARN ribosómico residual, madura en 1-2 días en sangre","Aún tiene núcleo","Se encuentra solo en médula, nunca en sangre"], correct:1, explain:"Los reticulocitos están enucleados pero conservan ARN ribosómico (el “retículo”), y maduran en la sangre periférica en 1-2 días."},
+  {tag:"rbc", stem:"¿Cuál es la vida media promedio de un eritrocito maduro?", options:["30 días","120 días","1 año","10 días"], correct:1, explain:"Los eritrocitos maduros circulan aproximadamente 120 días antes de ser retirados."},
+  {tag:"rbc", stem:"¿Dónde se retiran principalmente los eritrocitos senescentes?", options:["Riñón","Bazo e hígado (macrófagos)","Pulmones","Solo en la médula ósea"], correct:1, explain:"Los macrófagos esplénicos y hepáticos fagocitan los eritrocitos envejecidos y reciclan su hierro."},
+  {tag:"rbc", stem:"La forma bicóncava del eritrocito sirve principalmente para:", options:["Aumentar la superficie y la deformabilidad para el intercambio de gases","Almacenar reservas de oxígeno","Anclar el núcleo","Aumentar la rigidez"], correct:0, explain:"El disco bicóncavo aumenta la relación superficie/volumen y permite la deformabilidad necesaria para atravesar capilares."},
+  {tag:"rbc", stem:"Un aumento de CO2 / caída del pH desplaza la curva de disociación de oxihemoglobina:", options:["A la izquierda, aumentando la afinidad por O2","A la derecha, disminuyendo la afinidad por O2 (efecto Bohr)","No tiene efecto","Elimina la unión cooperativa"], correct:1, explain:"El efecto Bohr: más CO2/menor pH desplaza la curva a la derecha, favoreciendo la liberación de O2 al tejido metabólicamente activo."},
+  {tag:"rbc", stem:"¿Dónde ocurre principalmente la reacción de la anhidrasa carbónica (CO2 + H2O ↔ H2CO3)?", options:["En el plasma","Dentro del eritrocito","En el epitelio alveolar","Solo en el túbulo renal"], correct:1, explain:"La anhidrasa carbónica es abundante dentro del eritrocito, convirtiendo rápidamente el CO2 y el agua en ácido carbónico."},
+  {tag:"rbc", stem:"En el intercambio de cloruro, cuando el HCO3⁻ sale del eritrocito hacia el plasma:", options:["Entra Na+ para equilibrar la carga","Entra Cl⁻ a través del intercambiador banda 3","Sale K+ de la célula","Nada más se mueve"], correct:1, explain:"El intercambiador aniónico banda 3 (AE1) intercambia el HCO3⁻ que sale por Cl⁻ que entra, preservando la electroneutralidad."},
+  {tag:"wbc", stem:"¿Cuál es el leucocito circulante más abundante?", options:["Eosinófilo","Basófilo","Neutrófilo","Monocito"], correct:2, explain:"Los neutrófilos constituyen aproximadamente 50-70% del diferencial leucocitario normal."},
+  {tag:"wbc", stem:"Un núcleo bilobulado con gránulos rojo-anaranjados, activo contra parásitos, describe al:", options:["Neutrófilo","Eosinófilo","Basófilo","Linfocito"], correct:1, explain:"Los eosinófilos tienen un característico núcleo bilobulado y gránulos eosinofílicos, y actúan contra parásitos grandes."},
+  {tag:"wbc", stem:"¿Las selectinas median qué paso de la extravasación?", options:["Adhesión firme","Rodamiento","Diapédesis","Quimiotaxis"], correct:1, explain:"Las uniones mediadas por selectinas son débiles y transitorias, produciendo el rodamiento sobre el endotelio."},
+  {tag:"wbc", stem:"¿Las integrinas median qué paso de la extravasación?", options:["Rodamiento","Adhesión firme (arresto)","Solo la marginación","Ninguna de las anteriores"], correct:1, explain:"Las integrinas de alta afinidad (LFA-1, VLA-4) se unen a ICAM-1/VCAM-1 endoteliales para producir el arresto firme."},
+  {tag:"wbc", stem:"PECAM-1/CD31 se asocia principalmente con:", options:["Rodamiento","Diapédesis (transmigración)","Quimiotaxis","Marginación"], correct:1, explain:"Las interacciones de PECAM-1 en las uniones endoteliales ayudan al leucocito a deslizarse hacia el tejido."},
+  {tag:"mono", stem:"En el tejido, un monocito típicamente se diferencia en:", options:["Neutrófilo","Macrófago (o célula dendrítica derivada de monocito)","Linfocito","Eritrocito"], correct:1, explain:"Una vez en el tejido, los monocitos se diferencian en macrófagos o, en algunos contextos, en células dendríticas."},
+  {tag:"mono", stem:"¿Cuál NO es una función típica del macrófago?", options:["Fagocitosis de detritos","Producción de citocinas","Secreción de anticuerpos","Presentación de antígeno"], correct:2, explain:"La secreción de anticuerpos es función de las células plasmáticas (linfocitos B diferenciados), no de los macrófagos."},
+  {tag:"mono", stem:"¿Qué citocinas producen clásicamente los monocitos/macrófagos activados?", options:["TNF-α, IL-1, IL-6","Insulina, glucagón","Eritropoyetina, trombopoyetina","Solo IgG"], correct:0, explain:"TNF-α, IL-1 e IL-6 son citocinas proinflamatorias distintivas liberadas por monocitos/macrófagos activados."},
+  {tag:"apc", stem:"Las moléculas MHC clase I presentan antígeno principalmente a:", options:["Linfocitos T CD4+","Linfocitos T CD8+","Linfocitos B","Células NK"], correct:1, explain:"El MHC I presenta péptidos endógenos a linfocitos T citotóxicos CD8+."},
+  {tag:"apc", stem:"Las moléculas MHC clase II presentan antígeno principalmente a:", options:["Linfocitos T CD8+","Linfocitos T CD4+","Neutrófilos","Eritrocitos"], correct:1, explain:"El MHC II presenta péptidos exógenos/fagocitados a linfocitos T colaboradores CD4+."},
+  {tag:"apc", stem:"Una bacteria extracelular fagocitada por un macrófago se procesa y presenta vía:", options:["Solo MHC I","MHC II","Ninguna vía","Fusión directa de membrana, sin MHC"], correct:1, explain:"El material extracelular fagocitado sigue la vía exógena hacia el MHC II."},
+  {tag:"apc", stem:"Una proteína viral producida en el citoplasma de una célula infectada se presenta vía:", options:["MHC I (vía endógena/proteasoma/TAP)","Solo MHC II","Ninguna vía","Solo por células dendríticas"], correct:0, explain:"Las proteínas citosólicas son degradadas por el proteasoma, transportadas vía TAP, y cargadas en el MHC I."},
+  {tag:"apc", stem:"La presentación cruzada se refiere a:", options:["Linfocitos B presentando a linfocitos T","Células dendríticas presentando antígeno exógeno vía MHC I a linfocitos T CD8+","MHC I presentando solo péptidos propios","Macrófagos ignorando el antígeno fagocitado"], correct:1, explain:"La presentación cruzada es la capacidad especializada de las células dendríticas de dirigir antígeno exógeno hacia el MHC I."},
+  {tag:"apc", stem:"¿Qué células expresan MHC clase I?", options:["Solo las CPA profesionales","Solo los linfocitos B","Prácticamente todas las células nucleadas","Solo los eritrocitos"], correct:2, explain:"El MHC I se expresa en casi todas las células nucleadas, a diferencia del MHC II, restringido principalmente a las CPA profesionales."}
 ];
 /* === DATA_END === */
 
@@ -492,6 +492,48 @@ function longBoneSVG(colors){
   + '</g></svg>';
 }
 
+let __mriGrainId = 0;
+function mriScanSVG(opts){
+  opts = opts || {};
+  const epi = opts.epi || '#5c5c5c';
+  const meta = opts.meta || '#5c5c5c';
+  const dia = opts.dia || '#f2f2f2';
+  const seqLabel = opts.seqLabel || 'T1';
+  const planeLabel = opts.planeLabel || 'COR';
+  __mriGrainId++;
+  const fid = 'mriGrain'+__mriGrainId;
+  return '<svg viewBox="0 0 280 340" width="280" height="340" style="width:100%;height:auto;display:block;background:#000;border-radius:6px;" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs>'
+  +   '<filter id="'+fid+'"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="'+ (opts.seed||7) +'" stitchTiles="stitch" result="n"/>'
+  +     '<feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.5 0.5 0.5 0 0" result="g"/>'
+  +     '<feComponentTransfer in="g"><feFuncA type="linear" slope="0.16" intercept="0"/></feComponentTransfer>'
+  +   '</filter>'
+  +   '<radialGradient id="'+fid+'v" cx="50%" cy="46%" r="65%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.75"/></radialGradient>'
+  + '</defs>'
+  + '<rect x="0" y="0" width="280" height="340" fill="#050505"/>'
+  + '<g stroke="#000" stroke-width="1.5" stroke-linejoin="round">'
+  +   '<ellipse cx="140" cy="46" rx="40" ry="26" fill="'+epi+'"/>'
+  +   '<path d="M104 66 Q95 84 100 96 L180 96 Q185 84 176 66 Z" fill="'+meta+'"/>'
+  +   '<rect x="100" y="96" width="80" height="150" fill="'+dia+'"/>'
+  +   '<path d="M100 246 Q95 258 104 276 L176 276 Q185 258 180 246 Z" fill="'+meta+'"/>'
+  +   '<ellipse cx="140" cy="298" rx="40" ry="26" fill="'+epi+'"/>'
+  + '</g>'
+  + '<rect x="0" y="0" width="280" height="340" fill="url(#'+fid+')"/>'
+  + '<rect x="0" y="0" width="280" height="340" fill="url('+"'"+'#'+fid+"v')"+'"/>'
+  + '<g font-family="var(--font-mono)" fill="#8fe6a8" font-size="11">'
+  +   '<text x="10" y="18">'+esc(seqLabel)+'</text>'
+  +   '<text x="10" y="332">'+esc(planeLabel)+'</text>'
+  +   '<text x="270" y="18" text-anchor="end">TR 550</text>'
+  +   '<text x="270" y="32" text-anchor="end">TE 11</text>'
+  +   '<text x="270" y="332" text-anchor="end">SIMULADO</text>'
+  + '</g>'
+  + '<text x="14" y="170" fill="#8fe6a8" font-family="var(--font-mono)" font-size="13">L</text>'
+  + '<line x1="20" y1="300" x2="20" y2="320" stroke="#8fe6a8" stroke-width="1"/>'
+  + '<line x1="16" y1="300" x2="24" y2="300" stroke="#8fe6a8" stroke-width="1"/>'
+  + '<line x1="16" y1="320" x2="24" y2="320" stroke="#8fe6a8" stroke-width="1"/>'
+  + '</svg>';
+}
+
 function eryCellSVG(stage){
   const d = stage.size, nd = stage.nucleus, cyto = stage.cyto;
   const cx=90, cy=90;
@@ -528,16 +570,16 @@ function mountStepper(container, stages, renderFn, opts){
     + '<div class="stage-caption" id="stCaption"></div>'
     + '<div class="stage-dots">'+dotsHTML+'</div>'
     + '<div class="stepper-controls">'
-    +   '<button class="btn sm" id="stBack">&larr; BACK</button>'
-    +   '<button class="btn sm primary" id="stPlay">&#9654; PLAY</button>'
-    +   '<button class="btn sm" id="stNext">NEXT &rarr;</button>'
-    +   '<button class="btn sm ghost" id="stReset">RESET</button>'
+    +   '<button class="btn sm" id="stBack">&larr; ATRÁS</button>'
+    +   '<button class="btn sm primary" id="stPlay">&#9654; REPRODUCIR</button>'
+    +   '<button class="btn sm" id="stNext">SIGUIENTE &rarr;</button>'
+    +   '<button class="btn sm ghost" id="stReset">REINICIAR</button>'
     + '</div></div>';
   const dots = container.querySelectorAll('.dot');
   const playBtn = container.querySelector('#stPlay');
   const backBtn = container.querySelector('#stBack');
   const nextBtn = container.querySelector('#stNext');
-  function stop(){ playing=false; clearInterval(timer); timer=null; playBtn.innerHTML='&#9654; PLAY'; }
+  function stop(){ playing=false; clearInterval(timer); timer=null; playBtn.innerHTML='&#9654; REPRODUCIR'; }
   function show(i){
     if(!container.isConnected){ stop(); return; }
     idx = Math.max(0, Math.min(stages.length-1, i));
@@ -549,7 +591,7 @@ function mountStepper(container, stages, renderFn, opts){
   }
   function play(){
     if(idx>=stages.length-1) idx=-1;
-    playing = true; playBtn.innerHTML = '&#10074;&#10074; PAUSE';
+    playing = true; playBtn.innerHTML = '&#10074;&#10074; PAUSA';
     timer = setInterval(()=>{
       if(!container.isConnected){ stop(); return; }
       if(idx < stages.length-1) show(idx+1); else stop();
@@ -603,7 +645,7 @@ function renderMCQ(container, q, onDone){
     '<div class="quiz-stem">'+esc(q.stem)+'</div>'
   + '<div id="mcqOpts">'+q.options.map((o,i)=>'<button class="option" data-i="'+i+'">'+esc(o)+'</button>').join('')+'</div>'
   + '<div class="explain" id="mcqExplain">'+esc(q.explain)+'</div>'
-  + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="mcqNext" style="display:none;">CONTINUE &rarr;</button></div>';
+  + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="mcqNext" style="display:none;">CONTINUAR &rarr;</button></div>';
   const opts = container.querySelectorAll('.option');
   let answered=false;
   opts.forEach(btn=>{
@@ -640,43 +682,43 @@ const ICONS = {
 };
 
 const MOD_LIST = [
-  {id:'mri', num:'01', title:'Bone Marrow MRI', desc:'Red vs yellow marrow, T1/T2/STIR signal, age conversion.', color:'var(--marrow)'},
-  {id:'hemato', num:'02', title:'Hematopoiesis', desc:'Interactive stem cell lineage tree.', color:'var(--accent)'},
-  {id:'eryth', num:'03', title:'Erythropoiesis', desc:'Stage-by-stage maturation and the EPO feedback loop.', color:'var(--marrow-red)'},
-  {id:'rbc', num:'04', title:'Erythrocyte Physiology', desc:'Structure, O2/CO2 transport, acid-base, lifespan.', color:'#e0505a'},
-  {id:'wbc', num:'05', title:'Leukocytes', desc:'Five cell types plus the extravasation simulator.', color:'var(--wbc)'},
-  {id:'mono', num:'06', title:'Monocytes', desc:'Blood to tissue to macrophage, and phagocytosis.', color:'var(--mono-c)'},
-  {id:'apc', num:'07', title:'Antigen-Presenting Cells', desc:'MHC I vs MHC II and innate-to-adaptive immunity.', color:'var(--immune)'},
-  {id:'clinical', num:'08', title:'Clinical Connection', desc:'Short reasoning cases across every module.', color:'var(--warn)'},
-  {id:'quiz', num:'09', title:'Test Yourself', desc:'Active recall bank plus a timed exam mode.', color:'var(--good)'}
+  {id:'mri', num:'01', title:'Resonancia de Médula Ósea', desc:'Médula roja vs. amarilla, señal T1/T2/STIR, conversión por edad.', color:'var(--marrow)'},
+  {id:'hemato', num:'02', title:'Hematopoyesis', desc:'Árbol interactivo del linaje de la célula madre.', color:'var(--accent)'},
+  {id:'eryth', num:'03', title:'Eritropoyesis', desc:'Maduración por etapas y el ciclo de retroalimentación de la EPO.', color:'var(--marrow-red)'},
+  {id:'rbc', num:'04', title:'Fisiología del Eritrocito', desc:'Estructura, transporte de O2/CO2, equilibrio ácido-base, vida media.', color:'#e0505a'},
+  {id:'wbc', num:'05', title:'Leucocitos', desc:'Cinco tipos celulares más el simulador de extravasación.', color:'var(--wbc)'},
+  {id:'mono', num:'06', title:'Monocitos', desc:'De la sangre al tejido al macrófago, y fagocitosis.', color:'var(--mono-c)'},
+  {id:'apc', num:'07', title:'Células Presentadoras de Antígeno', desc:'MHC I vs. MHC II e inmunidad innata a adaptativa.', color:'var(--immune)'},
+  {id:'clinical', num:'08', title:'Conexión Clínica', desc:'Casos breves de razonamiento en todos los módulos.', color:'var(--warn)'},
+  {id:'quiz', num:'09', title:'Ponte a Prueba', desc:'Banco de recuperación activa más un modo examen cronometrado.', color:'var(--good)'}
 ];
 
 function renderHome(root){
   root.innerHTML =
     '<div class="hero">'
-    + '<div><div class="eyebrow">Hematopoietic Physiology Lab</div>'
-    + '<h1>From bone marrow<br>to blood and immunity</h1>'
-    + '<p class="sub">An interactive simulator for exploring where blood cells come from, how they work, how they are regulated, and how they connect to immunity &mdash; grounded in bone marrow MRI physiology and core hematology/immunology teaching.</p>'
-    + '<div class="btn-row"><button class="btn primary" onclick="navigate(\'mri\')">ENTER THE LAB &rarr;</button><button class="btn ghost" onclick="navigate(\'quiz\')">TEST YOURSELF</button></div></div>'
+    + '<div><div class="eyebrow">Laboratorio de Fisiología Hematopoyética</div>'
+    + '<h1>De la médula ósea<br>a la sangre y la inmunidad</h1>'
+    + '<p class="sub">Un simulador interactivo para explorar de dónde vienen las células sanguíneas, cómo funcionan, cómo se regulan y cómo se conectan con la inmunidad &mdash; fundamentado en la fisiología de la RM de médula ósea y en la enseñanza clásica de hematología e inmunología.</p>'
+    + '<div class="btn-row"><button class="btn primary" onclick="navigate(\'mri\')">ENTRAR AL LABORATORIO &rarr;</button><button class="btn ghost" onclick="navigate(\'quiz\')">PONTE A PRUEBA</button></div></div>'
     + '<div class="skeleton-wrap">'+(()=>{ const s=skeletonSVG('home'); return s; })()+'</div>'
     + '</div>'
     + '<div class="module-grid">'
-    + MOD_LIST.map(m=>'<button class="mod-card" style="--accent-c:'+m.color+'" onclick="navigate(\''+m.id+'\')"><div class="num">MODULE '+m.num+'</div><div class="icon">'+ICONS[m.id]+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p></button>').join('')
+    + MOD_LIST.map(m=>'<button class="mod-card" style="--accent-c:'+m.color+'" onclick="navigate(\''+m.id+'\')"><div class="num">MÓDULO '+m.num+'</div><div class="icon">'+ICONS[m.id]+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p></button>').join('')
     + '</div>';
   const svg = root.querySelector('.skeleton-wrap svg');
   applySkeletonColors(svg, 'home', AGE_STAGES[5].regions);
 }
 
 function mriDisclaimer(){
-  return '<div class="disclaimer"><b>&#9888;</b><div><b>Educational simulation:</b> MRI demonstrates bone marrow composition and distribution, not individual hematopoietic cells (no BFU-E, CFU-E, erythroblasts, reticulocytes, or individual leukocytes are ever visible on MRI).</div></div>';
+  return '<div class="disclaimer"><b>&#9888;</b><div><b>Simulación educativa:</b> la RM muestra la composición y distribución de la médula ósea, no células hematopoyéticas individuales (nunca se ven en una RM BFU-E, CFU-E, eritroblastos, reticulocitos ni leucocitos individuales).</div></div>';
 }
 
 function renderMRI(root){
   let tab = 'comp', seq = 'T1', isolate = null, compareOpen = false, ageIdx = 5;
   function paint(){
-    root.innerHTML = moduleHeader('Module 01 &middot; Radiology', 'Bone Marrow MRI')
+    root.innerHTML = moduleHeader('Módulo 01 &middot; Radiología', 'Resonancia de Médula Ósea')
       + mriDisclaimer()
-      + tabsBar([{id:'comp',label:'COMPOSITION'},{id:'seq',label:'T1 / T2 / STIR'},{id:'age',label:'AGE CONVERSION'},{id:'zoom',label:'ZOOM TO MARROW'}], tab)
+      + tabsBar([{id:'comp',label:'COMPOSICIÓN'},{id:'seq',label:'T1 / T2 / STIR'},{id:'age',label:'CONVERSIÓN POR EDAD'},{id:'zoom',label:'ZOOM A LA MÉDULA'}], tab)
       + '<div id="mriBody"></div>';
     wireTabs(root, t=>{ tab=t; paint(); });
     paintBody();
@@ -692,27 +734,26 @@ function renderMRI(root){
     const r=MARROW_COMPOSITION.red, y=MARROW_COMPOSITION.yellow;
     function box(m){
       return '<div class="compare-box"><h4><span class="swatch" style="background:'+m.color+'"></span>'+m.name+'</h4>'
-      + '<div class="stat-row"><span>Hematopoietic cells</span><span>'+m.cellPct+'%</span></div>'+pbar(m.cellPct, m.color)
-      + '<div class="stat-row" style="margin-top:10px;"><span>Adipocytes</span><span>'+m.fatCellPct+'%</span></div>'+pbar(m.fatCellPct, 'var(--text-faint)')
-      + '<div style="margin-top:16px;"><table class="comp-table"><tr><th>Chemical composition</th><th></th></tr>'
-      + '<tr><td>Fat</td><td>'+m.chem.fat+'%</td></tr><tr><td>Water</td><td>'+m.chem.water+'%</td></tr><tr><td>Protein</td><td>'+m.chem.protein+'%</td></tr></table></div>'
+      + '<div class="stat-row"><span>Células hematopoyéticas</span><span>'+m.cellPct+'%</span></div>'+pbar(m.cellPct, m.color)
+      + '<div class="stat-row" style="margin-top:10px;"><span>Adipocitos</span><span>'+m.fatCellPct+'%</span></div>'+pbar(m.fatCellPct, 'var(--text-faint)')
+      + '<div style="margin-top:16px;"><table class="comp-table"><tr><th>Composición química</th><th></th></tr>'
+      + '<tr><td>Grasa</td><td>'+m.chem.fat+'%</td></tr><tr><td>Agua</td><td>'+m.chem.water+'%</td></tr><tr><td>Proteínas</td><td>'+m.chem.protein+'%</td></tr></table></div>'
       + '<p style="margin-top:12px;">'+m.function+'</p></div>';
     }
     body.innerHTML = '<div class="grid-2">'+box(r)+box(y)+'</div>'
-      + '<div style="margin-top:14px;">'+chip('Source: '+SRC_MRI,'source')+'</div>';
+      + '<div style="margin-top:14px;">'+chip('Fuente: '+SRC_MRI,'source')+'</div>';
   }
   function paintSeq(body){
     const S = MRI_SEQUENCES[seq];
-    const epiMetaColor = isolate==='yellow' ? 'rgba(93,110,130,.25)' : S.red.gray;
-    const diaColor = isolate==='red' ? 'rgba(93,110,130,.25)' : S.yellow.gray;
+    const epiMetaColor = isolate==='yellow' ? '#2c333d' : S.red.gray;
+    const diaColor = isolate==='red' ? '#2c333d' : S.yellow.gray;
     if(compareOpen){
-      body.innerHTML = '<div class="panel"><div class="select-grid">'+['T1','T2','STIR'].map(k=>'<span class="pill" style="background:'+(k===seq?'var(--accent)':'')+'">'+k+'</span>').join('')+'</div>'
-      + '<div class="grid-3">'+['T1','T2','STIR'].map(k=>{
+      body.innerHTML = '<div class="panel"><h3 style="text-align:center;">Comparación de secuencias</h3><div class="grid-3">'+['T1','T2','STIR'].map(k=>{
           const Sk = MRI_SEQUENCES[k];
-          return '<div class="compare-box"><h4>'+Sk.label+'</h4><div style="max-width:140px;margin:0 auto;">'+longBoneSVG({epi:Sk.red.gray, meta:Sk.red.gray, dia:Sk.yellow.gray})+'</div>'
-          + '<p style="font-size:11.5px;">Yellow: '+Sk.yellow.desc+'</p><p style="font-size:11.5px;">Red: '+Sk.red.desc+'</p></div>';
+          return '<div class="compare-box"><h4>'+Sk.label+'</h4><div style="max-width:180px;margin:0 auto;">'+mriScanSVG({epi:Sk.red.gray, meta:Sk.red.gray, dia:Sk.yellow.gray, seqLabel:k, seed:3})+'</div>'
+          + '<p style="font-size:11.5px;">Amarilla: '+Sk.yellow.desc+'</p><p style="font-size:11.5px;">Roja: '+Sk.red.desc+'</p></div>';
         }).join('')+'</div>'
-      + '<div class="btn-row" style="margin-top:16px;"><button class="btn" id="seqBackBtn">&larr; BACK TO SINGLE VIEW</button></div></div>';
+      + '<div class="btn-row" style="margin-top:16px;justify-content:center;"><button class="btn" id="seqBackBtn">&larr; VOLVER A VISTA ÚNICA</button></div></div>';
       body.querySelector('#seqBackBtn').onclick=()=>{ compareOpen=false; paintSeq(body); };
       return;
     }
@@ -720,20 +761,20 @@ function renderMRI(root){
       '<div class="panel">'
       + '<div class="select-grid">'+Object.keys(MRI_SEQUENCES).map(k=>'<button class="pill'+(k===seq?' active':'')+'" data-seq="'+k+'" style="'+(k===seq?'background:var(--accent);border-color:var(--accent);':'')+'">'+k+'</button>').join('')+'</div>'
       + '<div class="grid-2">'
-      +   '<div style="max-width:220px;margin:0 auto;">'+longBoneSVG({epi:epiMetaColor, meta:epiMetaColor, dia:diaColor})+'</div>'
+      +   '<div style="max-width:260px;margin:0 auto;">'+mriScanSVG({epi:epiMetaColor, meta:epiMetaColor, dia:diaColor, seqLabel:seq, planeLabel:'COR FÉMUR', seed:5})+'</div>'
       +   '<div><h3>'+S.label+'</h3>'
-      +     '<p><span class="swatch" style="background:var(--marrow)"></span> <b>Yellow marrow zone (diaphysis):</b> '+S.yellow.desc+'</p>'
-      +     '<p><span class="swatch" style="background:var(--marrow-red)"></span> <b>Red marrow zone (metaphysis/epiphysis):</b> '+S.red.desc+'</p>'
+      +     '<p><span class="swatch" style="background:var(--marrow)"></span> <b>Zona de médula amarilla (diáfisis):</b> '+S.yellow.desc+'</p>'
+      +     '<p><span class="swatch" style="background:var(--marrow-red)"></span> <b>Zona de médula roja (metáfisis/epífisis):</b> '+S.red.desc+'</p>'
       +     '<div class="btn-row">'
-      +       '<button class="btn sm" id="whyBtn">WHY?</button>'
-      +       '<button class="btn sm" id="cmpBtn">COMPARE ALL</button>'
-      +       '<button class="btn sm" id="showRedBtn">SHOW RED MARROW</button>'
-      +       '<button class="btn sm" id="showYellowBtn">SHOW YELLOW MARROW</button>'
+      +       '<button class="btn sm" id="whyBtn">¿POR QUÉ?</button>'
+      +       '<button class="btn sm" id="cmpBtn">COMPARAR TODO</button>'
+      +       '<button class="btn sm" id="showRedBtn">MOSTRAR MÉDULA ROJA</button>'
+      +       '<button class="btn sm" id="showYellowBtn">MOSTRAR MÉDULA AMARILLA</button>'
       +     '</div>'
       +     '<div class="why-box" id="whyBox">'+S.why+'</div>'
       +   '</div>'
       + '</div>'
-      + '<div class="side-note">Simulated signal schematic, not a real patient image. '+chip('Source: '+SRC_MRI,'source')+'</div>'
+      + '<div class="side-note">Esquema de señal simulado, no es la imagen de un paciente real. '+chip('Fuente: '+SRC_MRI,'source')+'</div>'
       + '</div>';
     body.querySelectorAll('[data-seq]').forEach(b=>b.onclick=()=>{ seq=b.dataset.seq; paintSeq(body); });
     body.querySelector('#whyBtn').onclick=()=>body.querySelector('#whyBox').classList.toggle('open');
@@ -745,34 +786,36 @@ function renderMRI(root){
     const st = AGE_STAGES[ageIdx];
     body.innerHTML =
       '<div class="panel">'
-      + '<div class="slider-block"><label><span>AGE</span><span>'+st.label+'</span></label>'
+      + '<div class="slider-block"><label><span>EDAD</span><span>'+st.label+'</span></label>'
       + '<input type="range" id="ageSlider" min="0" max="'+(AGE_STAGES.length-1)+'" step="1" value="'+ageIdx+'">'
       + '<div class="age-ticks">'+AGE_STAGES.map(s=>'<span>'+s.label+'</span>').join('')+'</div></div>'
       + '<div class="grid-2">'
       +   '<div class="skeleton-wrap">'+skeletonSVG('age')+'</div>'
       +   '<div><div style="max-width:160px;margin:0 auto 14px;">'+longBoneSVG({epi:REGION_COLOR[st.regions.femProxL], meta:REGION_COLOR[st.regions.femProxL], dia:REGION_COLOR[st.regions.femDiaL]})+'</div>'
       +     '<p>'+st.text+'</p>'
-      +     '<div class="btn-row">'+['red','redyellow','yellow','cartilage'].map(k=>'<span class="chip"><span class="swatch" style="background:'+REGION_COLOR[k]+'"></span> '+({red:'Red marrow',redyellow:'Converting',yellow:'Yellow marrow',cartilage:'Cartilage (unossified)'}[k])+'</span>').join('')+'</div>'
+      +     '<div class="btn-row">'+['red','redyellow','yellow','cartilage'].map(k=>'<span class="chip"><span class="swatch" style="background:'+REGION_COLOR[k]+'"></span> '+({red:'Médula roja',redyellow:'En conversión',yellow:'Médula amarilla',cartilage:'Cartílago (no osificado)'}[k])+'</span>').join('')+'</div>'
       +   '</div>'
       + '</div>'
-      + '<p class="side-note">Marrow conversion is faster in girls than boys; individual studies vary, so interpretation is always done case by case. Simplified didactic schematic based on Londoño et al., 2015. '+chip('Source: '+SRC_MRI,'source')+'</p>'
+      + '<p class="side-note">La conversión medular es más rápida en niñas que en niños; hay variación individual entre estudios, por lo que la interpretación siempre se hace caso por caso. Esquema didáctico simplificado basado en Londoño et al., 2015. '+chip('Fuente: '+SRC_MRI,'source')+'</p>'
       + '</div>';
     applySkeletonColors(body.querySelector('.skeleton-wrap svg'), 'age', st.regions);
     body.querySelector('#ageSlider').oninput = (e)=>{ ageIdx = +e.target.value; paintAge(body); };
   }
   function paintZoom(body){
     const ZOOM_STAGES = [
-      {name:'MRI Slice', size:70, color:'#3a3a3a', desc:'A T1-weighted image of the vertebral body region you selected.'},
-      {name:'Cortical Bone', size:100, color:'#cbb98a', desc:'The dense outer shell of the bone.'},
-      {name:'Spongy (Trabecular) Bone', size:130, color:'#b79e6b', desc:'Porous inner bone providing structural support.'},
-      {name:'Trabeculae', size:160, color:'#a98c55', desc:'Bony struts that scaffold the marrow space.'},
-      {name:'Red Marrow', size:190, color:'#e0505a', desc:'The hematopoietic tissue filling the space between trabeculae.'},
-      {name:'Hematopoietic Niche', size:210, color:'#c94550', desc:'A microenvironment of stromal and endothelial cells that supports stem cells.'},
-      {name:'Hematopoietic Stem Cell', size:60, color:'#35c7ff', desc:'The pluripotent origin of every blood lineage. The radiology module ends here; cellular physiology begins next.'}
+      {name:'Corte de RM', size:70, color:'#3a3a3a', desc:'Una imagen potenciada en T1 de la región del cuerpo vertebral que seleccionaste.', mri:true},
+      {name:'Hueso cortical', size:100, color:'#cbb98a', desc:'La capa externa densa del hueso.'},
+      {name:'Hueso esponjoso (trabecular)', size:130, color:'#b79e6b', desc:'Hueso interno poroso que brinda soporte estructural.'},
+      {name:'Trabéculas', size:160, color:'#a98c55', desc:'Puentes óseos que dan andamiaje al espacio medular.'},
+      {name:'Médula ósea roja', size:190, color:'#e0505a', desc:'El tejido hematopoyético que llena el espacio entre las trabéculas.'},
+      {name:'Nicho hematopoyético', size:210, color:'#c94550', desc:'Un microambiente de células del estroma y del endotelio que sostiene a las células madre.'},
+      {name:'Célula madre hematopoyética', size:60, color:'#35c7ff', desc:'El origen pluripotente de todos los linajes sanguíneos. Aquí termina el módulo radiológico; a continuación comienza la fisiología celular.'}
     ];
-    body.innerHTML = '<div class="panel"><h3 style="text-align:center;">ZOOM INTO ACTIVE MARROW</h3><div id="zoomStepper"></div><div class="btn-row" id="zoomContinueRow" style="justify-content:center;display:none;"><button class="btn primary" onclick="navigate(\'hemato\')">CONTINUE TO HEMATOPOIESIS &rarr;</button></div></div>';
+    body.innerHTML = '<div class="panel"><h3 style="text-align:center;">ZOOM A LA MÉDULA ACTIVA</h3><div id="zoomStepper"></div><div class="btn-row" id="zoomContinueRow" style="justify-content:center;display:none;"><button class="btn primary" onclick="navigate(\'hemato\')">CONTINUAR A HEMATOPOYESIS &rarr;</button></div></div>';
     mountStepper(body.querySelector('#zoomStepper'), ZOOM_STAGES, (s,i,n)=>{
-      body.querySelector('#stCanvas').innerHTML = '<div style="width:'+s.size+'px;height:'+s.size+'px;border-radius:50%;background:'+s.color+';transition:all .5s ease;box-shadow:0 0 30px '+s.color+'55;"></div>';
+      body.querySelector('#stCanvas').innerHTML = s.mri
+        ? '<div style="width:220px;">'+mriScanSVG({epi:'#5c5c5c', meta:'#5c5c5c', dia:'#f2f2f2', seqLabel:'T1', planeLabel:'SAG COLUMNA', seed:9})+'</div>'
+        : '<div style="width:'+s.size+'px;height:'+s.size+'px;border-radius:50%;background:'+s.color+';transition:all .5s ease;box-shadow:0 0 30px '+s.color+'55;"></div>';
       body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
       body.querySelector('#zoomContinueRow').style.display = i===n-1 ? 'flex' : 'none';
     });
@@ -782,7 +825,7 @@ function renderMRI(root){
 function findNode(id, node){ node = node || HEMATO_TREE; if(node.id===id) return node; if(node.children){ for(const c of node.children){ const f=findNode(id,c); if(f) return f; } } return null; }
 function infoPanelHTML(node){
   const sections=['origin','function','location','characteristics','fate'];
-  const labels={origin:'Origin',function:'Function',location:'Location',characteristics:'Characteristics',fate:'Fate'};
+  const labels={origin:'Origen',function:'Función',location:'Ubicación',characteristics:'Características',fate:'Destino'};
   return '<div class="panel"><h3>'+node.name+'</h3>'
     + sections.map(k=>'<details style="margin-bottom:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--bg-2);"><summary style="cursor:pointer;font-weight:600;font-size:13px;">'+labels[k]+'</summary><p style="margin-top:8px;">'+node.info[k]+'</p></details>').join('')
     + '</div>';
@@ -790,8 +833,8 @@ function infoPanelHTML(node){
 function renderHemato(root){
   let selected = null;
   function paint(){
-    root.innerHTML = moduleHeader('Module 02 &middot; Hematopoiesis','Hematopoietic Stem Cell Lineage Tree')
-      + '<p style="color:var(--text-dim);max-width:70ch;">Click any cell to reveal its origin, function, location, characteristics, and fate &mdash; one section at a time.</p>'
+    root.innerHTML = moduleHeader('Módulo 02 &middot; Hematopoyesis','Árbol de Linaje de la Célula Madre Hematopoyética')
+      + '<p style="color:var(--text-dim);max-width:70ch;">Haz clic en cualquier célula para revelar su origen, función, ubicación, características y destino &mdash; una sección a la vez.</p>'
       + '<div class="panel" style="margin-bottom:16px;">'
       + '<div style="display:flex;justify-content:center;margin-bottom:6px;"><button class="btn primary tree-node" data-id="hsc">'+HEMATO_TREE.name+'</button></div>'
       + '<div style="text-align:center;color:var(--text-faint);font-size:20px;margin:2px 0 14px;">&darr;</div>'
@@ -816,16 +859,16 @@ function flowArrow(){ return '<div class="flow-arrow">&rarr;</div>'; }
 function pillToggle(id,label){ return '<button class="pill" data-flag="'+id+'" data-state="normal">'+label+': NORMAL</button>'; }
 
 function renderEryth(root){
-  root.innerHTML = moduleHeader('Module 03 &middot; Erythropoiesis','From Stem Cell to Erythrocyte')
+  root.innerHTML = moduleHeader('Módulo 03 &middot; Eritropoyesis','De la Célula Madre al Eritrocito')
     + '<div class="panel"><div class="grid-2"><div id="eryStepperMount"></div><div><div id="eryReadouts"></div></div></div></div>'
     + '<div class="panel" style="margin-top:16px;">'
-    +   '<h3>EPO Feedback Simulator</h3>'
-    +   '<p class="side-note" style="margin-top:-6px;">Educational model &mdash; not a therapeutic dosing simulator.</p>'
+    +   '<h3>Simulador de Retroalimentación de EPO</h3>'
+    +   '<p class="side-note" style="margin-top:-6px;">Modelo educativo &mdash; no es un simulador de dosificación terapéutica.</p>'
     +   '<div class="grid-2">'
     +     '<div>'
-    +       '<div class="slider-block"><label><span>TISSUE O2</span><span id="o2Val">95%</span></label><input type="range" id="o2Slider" min="50" max="100" value="95"></div>'
-    +       '<div class="slider-block"><label><span>RENAL FUNCTION</span><span id="renalVal">100%</span></label><input type="range" id="renalSlider" min="10" max="100" value="100"></div>'
-    +       '<div class="select-grid">'+pillToggle('iron','IRON')+pillToggle('b12','VITAMIN B12')+pillToggle('folate','FOLATE')+'</div>'
+    +       '<div class="slider-block"><label><span>OXÍGENO TISULAR</span><span id="o2Val">95%</span></label><input type="range" id="o2Slider" min="50" max="100" value="95"></div>'
+    +       '<div class="slider-block"><label><span>FUNCIÓN RENAL</span><span id="renalVal">100%</span></label><input type="range" id="renalSlider" min="10" max="100" value="100"></div>'
+    +       '<div class="select-grid">'+pillToggle('iron','HIERRO')+pillToggle('b12','VITAMINA B12')+pillToggle('folate','FOLATO')+'</div>'
     +     '</div>'
     +     '<div><div id="epoFlow"></div><div id="epoNotes" style="font-size:12.5px;color:var(--text-dim);margin-top:8px;"></div></div>'
     +   '</div>'
@@ -835,9 +878,9 @@ function renderEryth(root){
     root.querySelector('#stCanvas').innerHTML = eryCellSVG(s);
     root.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'/'+n+'. '+s.name+'</h3><p>'+s.desc+'</p>';
     root.querySelector('#eryReadouts').innerHTML =
-      '<div class="stat-row"><span>Relative cell size</span></div>'+pbar(Math.round(s.size/70*100),'var(--accent)')
-    + '<div class="stat-row" style="margin-top:12px;"><span>Nuclear condensation</span><span>'+(s.nucleus>0?Math.round((70-s.nucleus)/70*100)+'%':'Enucleated')+'</span></div>'+pbar(s.nucleus>0?Math.round((70-s.nucleus)/70*100):100,'var(--immune)')
-    + '<div class="stat-row" style="margin-top:12px;"><span>Hemoglobin content</span><span>'+s.hb+'%</span></div>'+pbar(s.hb,'var(--marrow-red)');
+      '<div class="stat-row"><span>Tamaño celular relativo</span></div>'+pbar(Math.round(s.size/70*100),'var(--accent)')
+    + '<div class="stat-row" style="margin-top:12px;"><span>Condensación nuclear</span><span>'+(s.nucleus>0?Math.round((70-s.nucleus)/70*100)+'%':'Enucleado')+'</span></div>'+pbar(s.nucleus>0?Math.round((70-s.nucleus)/70*100):100,'var(--immune)')
+    + '<div class="stat-row" style="margin-top:12px;"><span>Contenido de hemoglobina</span><span>'+s.hb+'%</span></div>'+pbar(s.hb,'var(--marrow-red)');
   });
 
   const o2Slider=root.querySelector('#o2Slider'), renalSlider=root.querySelector('#renalSlider');
@@ -850,24 +893,25 @@ function renderEryth(root){
     const epoLevel = Math.max(5, Math.round((20 + hypoxicDrive*2.4) * (renal/100)));
     const hot = epoLevel > 45;
     root.querySelector('#epoFlow').innerHTML = '<div class="flow-diagram">'
-      + flowNode('Kidney', renal<60) + flowArrow()
+      + flowNode('Riñón', renal<60) + flowArrow()
       + flowNode('EPO &asymp; '+epoLevel, hot) + flowArrow()
-      + flowNode('Erythroid stimulus', hot) + flowArrow()
-      + flowNode('Reticulocytes', hot) + flowArrow()
-      + flowNode('Erythrocytes', hot)
+      + flowNode('Estímulo eritroide', hot) + flowArrow()
+      + flowNode('Reticulocitos', hot) + flowArrow()
+      + flowNode('Eritrocitos', hot)
       + '</div>';
     let notes=[];
-    if(renal<60) notes.push('Reduced renal function limits EPO synthesis capacity, blunting the response even under hypoxia (anemia of chronic kidney disease).');
-    if(flags.iron==='low') notes.push('Iron deficiency limits hemoglobin synthesis despite an adequate erythroid stimulus.');
-    if(flags.b12==='low' || flags.folate==='low') notes.push('B12/folate deficiency impairs DNA synthesis during maturation, producing large, immature-appearing precursors (megaloblastic pattern).');
-    if(o2<75) notes.push('Tissue hypoxia is driving increased EPO synthesis via the renal HIF pathway.');
-    root.querySelector('#epoNotes').innerHTML = notes.map(n=>'<p>&bull; '+n+'</p>').join('') || '<p>Baseline state &mdash; no significant stimulus detected.</p>';
+    if(renal<60) notes.push('La función renal reducida limita la capacidad de síntesis de EPO, atenuando la respuesta incluso bajo hipoxia (anemia de la enfermedad renal crónica).');
+    if(flags.iron==='low') notes.push('La deficiencia de hierro limita la síntesis de hemoglobina a pesar de un estímulo eritroide adecuado.');
+    if(flags.b12==='low' || flags.folate==='low') notes.push('La deficiencia de B12/folato altera la síntesis de ADN durante la maduración, produciendo precursores grandes de aspecto inmaduro (patrón megaloblástico).');
+    if(o2<75) notes.push('La hipoxia tisular está impulsando un aumento en la síntesis de EPO vía la vía renal de HIF.');
+    root.querySelector('#epoNotes').innerHTML = notes.map(n=>'<p>&bull; '+n+'</p>').join('') || '<p>Estado basal &mdash; no se detecta un estímulo significativo.</p>';
   }
   o2Slider.oninput = recompute; renalSlider.oninput = recompute;
   root.querySelectorAll('[data-flag]').forEach(btn=>{
     btn.onclick = ()=>{
       const id=btn.dataset.flag; flags[id] = flags[id]==='normal'?'low':'normal';
-      btn.dataset.state = flags[id]; btn.textContent = btn.textContent.split(':')[0]+': '+flags[id].toUpperCase();
+      const stateLabel = flags[id]==='low' ? 'BAJO' : 'NORMAL';
+      btn.dataset.state = flags[id]; btn.textContent = btn.textContent.split(':')[0]+': '+stateLabel;
       btn.classList.toggle('active', flags[id]==='low');
       if(flags[id]==='low'){ btn.style.background='var(--warn)'; btn.style.color='#04121a'; btn.style.borderColor='var(--warn)'; }
       else { btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
@@ -879,12 +923,12 @@ function renderEryth(root){
 function paintStructure(body){
   body.innerHTML = '<div class="panel"><div class="grid-2">'
     + '<div style="text-align:center;"><svg viewBox="0 0 200 140" width="200" height="140" style="max-width:280px;width:100%;height:auto;display:block;margin:0 auto;"><g id="rbcShapeGroup" style="transform-box:fill-box;transform-origin:center;transition:transform .8s ease;"><ellipse cx="100" cy="70" rx="85" ry="42" fill="#c9414c" stroke="#0a0d12" stroke-width="2"/><ellipse cx="100" cy="70" rx="55" ry="20" fill="#e0505a" opacity="0.65"/></g></svg>'
-    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="squeezeBtn">SIMULATE CAPILLARY PASSAGE</button></div></div>'
+    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="squeezeBtn">SIMULAR PASO CAPILAR</button></div></div>'
     + '<div><ul style="padding-left:18px;color:var(--text-dim);font-size:13.5px;line-height:1.85;margin:0;">'
-    +   '<li><b style="color:var(--text)">Biconcave disc</b> &mdash; increases surface area for gas exchange.</li>'
-    +   '<li><b style="color:var(--text)">No nucleus, no organelles</b> &mdash; maximizes internal space for hemoglobin.</li>'
-    +   '<li><b style="color:var(--text)">Spectrin cytoskeleton</b> &mdash; gives the flexible membrane its deformability.</li>'
-    +   '<li><b style="color:var(--text)">Deformability</b> &mdash; lets the ~7-8&mu;m cell squeeze through narrower capillaries.</li>'
+    +   '<li><b style="color:var(--text)">Disco bicóncavo</b> &mdash; aumenta la superficie disponible para el intercambio de gases.</li>'
+    +   '<li><b style="color:var(--text)">Sin núcleo ni organelos</b> &mdash; maximiza el espacio interno para la hemoglobina.</li>'
+    +   '<li><b style="color:var(--text)">Citoesqueleto de espectrina</b> &mdash; le da a la membrana flexible su deformabilidad.</li>'
+    +   '<li><b style="color:var(--text)">Deformabilidad</b> &mdash; permite que la célula de ~7-8&mu;m se deslice por capilares más estrechos.</li>'
     +   '</ul></div></div></div>';
   body.querySelector('#squeezeBtn').onclick=()=>{
     const g=body.querySelector('#rbcShapeGroup');
@@ -900,10 +944,10 @@ function paintOxygenTab(body){
     +   '<div class="slider-block"><label><span>PO2 (mmHg)</span><span id="po2Val">40</span></label><input type="range" id="po2Slider" min="10" max="100" value="40"></div>'
     +   '<div class="slider-block"><label><span>pH</span><span id="phVal">7.40</span></label><input type="range" id="phSlider" min="710" max="760" value="740"></div>'
     +   '<div class="slider-block"><label><span>PCO2 (mmHg)</span><span id="co2Val">40</span></label><input type="range" id="co2Slider" min="20" max="80" value="40"></div>'
-    +   '<p class="side-note">Dashed curve = baseline (pH 7.40, PCO2 40). Solid curve = current conditions. Simplified schematic for teaching, not a patient-specific measurement.</p>'
+    +   '<p class="side-note">Curva punteada = basal (pH 7.40, PCO2 40). Curva sólida = condiciones actuales. Esquema simplificado con fines didácticos, no es una medición de un paciente real.</p>'
     + '</div></div></div>'
-    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Lung &rarr; Hemoglobin + O2 &rarr; Tissue</h3><div class="flow-diagram">'
-    + flowNode('Alveolus (high PO2)',false)+flowArrow()+flowNode('Hb + O2 &harr; HbO2',false)+flowArrow()+flowNode('Tissue (low PO2, O2 released)',false)
+    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Pulmón &rarr; Hemoglobina + O2 &rarr; Tejido</h3><div class="flow-diagram">'
+    + flowNode('Alvéolo (PO2 alta)',false)+flowArrow()+flowNode('Hb + O2 &harr; HbO2',false)+flowArrow()+flowNode('Tejido (PO2 baja, se libera O2)',false)
     + '</div></div>';
   const svg=body.querySelector('#o2svg'), po2S=body.querySelector('#po2Slider'), phS=body.querySelector('#phSlider'), co2S=body.querySelector('#co2Slider');
   function recompute(){
@@ -913,18 +957,18 @@ function paintOxygenTab(body){
     body.querySelector('#co2Val').textContent=co2;
     const p50 = 26.8 + (7.4-ph)*30 + (co2-40)*0.15;
     const sat = drawO2Curve(svg, po2, p50, 26.8);
-    const shift = p50>27.5 ? 'RIGHT (↓ O2 affinity — Bohr effect)' : (p50<26 ? 'LEFT (↑ O2 affinity)' : 'near baseline');
-    body.querySelector('#o2Readout').innerHTML = 'P50 &asymp; '+p50.toFixed(1)+' mmHg &middot; curve shifted '+shift+'<br>At PO2 '+po2+' mmHg &rarr; SaO2 &asymp; '+sat.toFixed(0)+'%';
+    const shift = p50>27.5 ? 'A LA DERECHA (↓ afinidad por O2 — efecto Bohr)' : (p50<26 ? 'A LA IZQUIERDA (↑ afinidad por O2)' : 'cerca del valor basal');
+    body.querySelector('#o2Readout').innerHTML = 'P50 &asymp; '+p50.toFixed(1)+' mmHg &middot; curva desplazada '+shift+'<br>Con PO2 '+po2+' mmHg &rarr; SaO2 &asymp; '+sat.toFixed(0)+'%';
   }
   po2S.oninput=recompute; phS.oninput=recompute; co2S.oninput=recompute; recompute();
 }
 function paintCO2Tab(body){
   const CO2_STAGES=[
-    {name:'Tissue CO2 production', desc:'Metabolizing tissue produces CO2 as a byproduct of respiration.'},
-    {name:'CO2 enters the erythrocyte', desc:'CO2 diffuses from plasma into the red blood cell.'},
-    {name:'Carbonic anhydrase', desc:'Carbonic anhydrase, abundant inside the erythrocyte, rapidly catalyzes CO2 + H2O → H2CO3.'},
-    {name:'Dissociation', desc:'Carbonic acid dissociates into H+ and HCO3⁻. Hemoglobin buffers most of the H+.'},
-    {name:'Chloride shift', desc:'HCO3⁻ exits into plasma via the band 3 exchanger, swapped for Cl⁻ entering the cell to preserve electroneutrality.'}
+    {name:'Producción tisular de CO2', desc:'El tejido en metabolismo produce CO2 como subproducto de la respiración.'},
+    {name:'El CO2 entra al eritrocito', desc:'El CO2 difunde desde el plasma hacia el eritrocito.'},
+    {name:'Anhidrasa carbónica', desc:'La anhidrasa carbónica, abundante dentro del eritrocito, cataliza rápidamente CO2 + H2O → H2CO3.'},
+    {name:'Disociación', desc:'El ácido carbónico se disocia en H+ y HCO3⁻. La hemoglobina amortigua la mayor parte del H+.'},
+    {name:'Intercambio de cloruro', desc:'El HCO3⁻ sale hacia el plasma a través del intercambiador banda 3, a cambio de Cl⁻ que entra a la célula para preservar la electroneutralidad.'}
   ];
   body.innerHTML='<div class="panel"><div id="co2Stepper"></div></div>';
   mountStepper(body.querySelector('#co2Stepper'), CO2_STAGES, (s,i)=>{
@@ -934,10 +978,10 @@ function paintCO2Tab(body){
 }
 function paintLifespan(body){
   body.innerHTML = '<div class="panel">'
-    + '<div class="slider-block"><label><span>DAYS IN CIRCULATION</span><span id="dayVal">0</span></label><input type="range" id="daySlider" min="0" max="120" value="0"></div>'
+    + '<div class="slider-block"><label><span>DÍAS EN CIRCULACIÓN</span><span id="dayVal">0</span></label><input type="range" id="daySlider" min="0" max="120" value="0"></div>'
     + '<div id="lifeCanvas" class="cell-canvas"></div>'
     + '<div id="lifeCaption" style="text-align:center;max-width:520px;margin:0 auto;"></div>'
-    + '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="jump120">JUMP TO DAY 120</button><button class="btn sm ghost" id="resetLife">RESET</button></div>'
+    + '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="jump120">IR AL DÍA 120</button><button class="btn sm ghost" id="resetLife">REINICIAR</button></div>'
     + '</div>';
   const slider=body.querySelector('#daySlider');
   function paintDay(d){
@@ -947,10 +991,10 @@ function paintLifespan(body){
       const r=Math.round(0xe0-(0xe0-0x8a)*t), g=Math.round(0x50-(0x50-0x4a)*t), b=Math.round(0x5a-(0x5a-0x4a)*t);
       const col='rgb('+r+','+g+','+b+')';
       body.querySelector('#lifeCanvas').innerHTML='<svg viewBox="0 0 180 180" width="180" height="180"><ellipse cx="90" cy="90" rx="34" ry="20" fill="'+col+'" stroke="#0a0d12" stroke-width="2"/></svg>';
-      body.querySelector('#lifeCaption').innerHTML = d<100 ? '<p>A mature erythrocyte circulating normally, delivering O2 and CO2.</p>' : '<p>Approaching senescence: membrane deformability declines with age.</p>';
+      body.querySelector('#lifeCaption').innerHTML = d<100 ? '<p>Un eritrocito maduro circulando con normalidad, transportando O2 y CO2.</p>' : '<p>Acercándose a la senescencia: la deformabilidad de la membrana disminuye con la edad.</p>';
     } else {
       body.querySelector('#lifeCanvas').innerHTML='<svg viewBox="0 0 180 180" width="180" height="180"><ellipse cx="90" cy="90" rx="46" ry="34" fill="var(--mono-c)" opacity="0.9"/><ellipse cx="72" cy="90" rx="13" ry="13" fill="#8a4a4a"/></svg>';
-      body.querySelector('#lifeCaption').innerHTML = '<p><b>Day &asymp;120:</b> the senescent erythrocyte is recognized and phagocytosed by macrophages in the spleen and liver. Hemoglobin is broken down: <b>iron</b> is recycled toward the marrow (via transferrin) to support new erythropoiesis, globin is reduced to amino acids, and heme is converted to bilirubin.</p>';
+      body.querySelector('#lifeCaption').innerHTML = '<p><b>Día &asymp;120:</b> el eritrocito senescente es reconocido y fagocitado por macrófagos del bazo y el hígado. La hemoglobina se degrada: el <b>hierro</b> se recicla hacia la médula (vía transferrina) para apoyar la nueva eritropoyesis, la globina se reduce a aminoácidos, y el hemo se convierte en bilirrubina.</p>';
     }
   }
   slider.oninput=(e)=>paintDay(+e.target.value);
@@ -961,8 +1005,8 @@ function paintLifespan(body){
 function renderRBC(root){
   let tab='structure';
   function paint(){
-    root.innerHTML = moduleHeader('Module 04 &middot; Erythrocyte Physiology','Structure, Gas Transport &amp; Lifespan')
-      + tabsBar([{id:'structure',label:'STRUCTURE'},{id:'oxygen',label:'OXYGEN'},{id:'co2',label:'CO2 / ACID-BASE'},{id:'lifespan',label:'LIFESPAN'}], tab)
+    root.innerHTML = moduleHeader('Módulo 04 &middot; Fisiología del Eritrocito','Estructura, Transporte de Gases y Vida Media')
+      + tabsBar([{id:'structure',label:'ESTRUCTURA'},{id:'oxygen',label:'OXÍGENO'},{id:'co2',label:'CO2 / EQUILIBRIO ÁCIDO-BASE'},{id:'lifespan',label:'VIDA MEDIA'}], tab)
       + '<div id="rbcBody"></div>';
     wireTabs(root, t=>{ tab=t; paint(); });
     const body=root.querySelector('#rbcBody');
@@ -999,23 +1043,23 @@ function paintCells(body, getActive, setActive){
   body.querySelector('#wbcCard').innerHTML = '<div class="panel"><div class="grid-2">'
     + '<div style="text-align:center;">'+wbcCellSVG(w)+'</div>'
     + '<div><h3 style="color:'+w.color+';">'+w.name+'</h3>'
-    +   '<p><b>Morphology:</b> '+w.morphology+'</p>'
-    +   '<p><b>Function:</b> '+w.func+'</p>'
-    +   '<p><b>Physiological role:</b> '+w.role+'</p>'
-    +   '<p><b>Fate:</b> '+w.fate+'</p>'
-    +   '<p style="color:var(--warn);"><b>Clinical correlation:</b> '+w.clinical+'</p>'
+    +   '<p><b>Morfología:</b> '+w.morphology+'</p>'
+    +   '<p><b>Función:</b> '+w.func+'</p>'
+    +   '<p><b>Rol fisiológico:</b> '+w.role+'</p>'
+    +   '<p><b>Destino:</b> '+w.fate+'</p>'
+    +   '<p style="color:var(--warn);"><b>Correlación clínica:</b> '+w.clinical+'</p>'
     + '</div></div></div>';
 }
 function paintExtrav(body){
   body.innerHTML = '<div class="panel">'
     + '<div class="vessel"><div class="vessel-lane" id="vesselLane"></div></div>'
     + '<div id="extravStepper"></div>'
-    + '<div class="btn-row" style="justify-content:center;margin-top:10px;"><button class="btn sm" id="extravWhy">WHY?</button></div>'
-    + '<div class="why-box" id="extravWhyBox">Why must a leukocyte adhere firmly before crossing the endothelium? Blood flow generates continuous shear stress. A weak, selectin-mediated bond would be swept away before the cell could squeeze between endothelial junctions &mdash; firm integrin-mediated adhesion anchors it long enough for diapedesis to occur.</div>'
+    + '<div class="btn-row" style="justify-content:center;margin-top:10px;"><button class="btn sm" id="extravWhy">¿POR QUÉ?</button></div>'
+    + '<div class="why-box" id="extravWhyBox">¿Por qué un leucocito debe adherirse firmemente antes de atravesar el endotelio? El flujo sanguíneo genera un estrés de cizallamiento continuo. Una unión débil, mediada por selectinas, sería arrastrada antes de que la célula pudiera deslizarse entre las uniones endoteliales &mdash; la adhesión firme mediada por integrinas la ancla el tiempo suficiente para que ocurra la diapédesis.</div>'
     + '</div>';
   const lane = body.querySelector('#vesselLane');
   let endoHTML=''; for(let i=0;i<8;i++){ endoHTML+='<div class="endo-cell" style="left:'+(i*46+10)+'px;"></div>'; }
-  endoHTML += '<div class="leuko-token" id="leukoToken" style="left:20px;top:20px;">WBC</div>';
+  endoHTML += '<div class="leuko-token" id="leukoToken" style="left:20px;top:20px;">GB</div>';
   lane.innerHTML = endoHTML;
   const token = lane.querySelector('#leukoToken');
   function positionToken(i){
@@ -1033,8 +1077,8 @@ function paintExtrav(body){
 function renderWBC(root){
   let sub='cells', active=WBC_TYPES[0].id;
   function paint(){
-    root.innerHTML = moduleHeader('Module 05 &middot; Leukocytes','Five Cell Types &amp; Extravasation')
-      + tabsBar([{id:'cells',label:'CELL TYPES'},{id:'extrav',label:'EXTRAVASATION SIMULATOR'}], sub)
+    root.innerHTML = moduleHeader('Módulo 05 &middot; Leucocitos','Cinco Tipos Celulares y Extravasación')
+      + tabsBar([{id:'cells',label:'TIPOS CELULARES'},{id:'extrav',label:'SIMULADOR DE EXTRAVASACIÓN'}], sub)
       + '<div id="wbcBody"></div>';
     wireTabs(root, t=>{ sub=t; paint(); });
     const body=root.querySelector('#wbcBody');
@@ -1043,19 +1087,19 @@ function renderWBC(root){
   paint();
 }
 function renderMono(root){
-  root.innerHTML = moduleHeader('Module 06 &middot; Monocytes','Blood &rarr; Tissue &rarr; Macrophage')
+  root.innerHTML = moduleHeader('Módulo 06 &middot; Monocitos','Sangre &rarr; Tejido &rarr; Macrófago')
     + '<div class="panel"><div id="monoStepper"></div></div>'
-    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Phagocytosis</h3>'
+    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Fagocitosis</h3>'
     +   '<div style="position:relative;height:220px;display:flex;align-items:center;justify-content:center;" id="phagoStage">'
     +     '<svg viewBox="0 0 200 200" width="220" height="220"><path d="M50 60 C30 90 40 150 90 160 C140 170 170 130 150 90 C135 60 90 40 50 60 Z" fill="var(--mono-c)" opacity="0.9"/></svg>'
     +     '<div id="phagoParticle" style="position:absolute;left:16px;top:20px;width:18px;height:18px;border-radius:50%;background:var(--marrow-red);transition:left 1s ease,top 1s ease,opacity .4s ease .9s;"></div>'
     +     '<div id="phagoBlob" style="position:absolute;left:96px;top:96px;width:16px;height:16px;border-radius:50%;background:#12181f;opacity:0;transition:opacity .4s ease;"></div>'
     +   '</div>'
-    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm primary" id="phagoBtn">SIMULATE PHAGOCYTOSIS</button><button class="btn sm ghost" id="phagoReset">RESET</button></div>'
+    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm primary" id="phagoBtn">SIMULAR FAGOCITOSIS</button><button class="btn sm ghost" id="phagoReset">REINICIAR</button></div>'
     +   '<p id="phagoCaption" style="text-align:center;color:var(--text-dim);min-height:20px;"></p>'
     + '</div>'
-    + '<div class="panel" style="margin-top:16px;"><h3>Macrophage Functions</h3><div class="select-grid" id="monoChips">'
-    +   ['Cytokine production','Debris clearance','Tissue repair','Antigen presentation'].map(t=>'<button class="pill" data-t="'+t+'">'+t+'</button>').join('')
+    + '<div class="panel" style="margin-top:16px;"><h3>Funciones del Macrófago</h3><div class="select-grid" id="monoChips">'
+    +   ['Producción de citocinas','Eliminación de detritos','Reparación tisular','Presentación de antígeno'].map(t=>'<button class="pill" data-t="'+t+'">'+t+'</button>').join('')
     + '</div><div id="monoChipInfo" class="side-note"></div></div>';
 
   mountStepper(root.querySelector('#monoStepper'), MONO_STAGES, (s,i)=>{
@@ -1066,22 +1110,22 @@ function renderMono(root){
   const particle = root.querySelector('#phagoParticle'), blob=root.querySelector('#phagoBlob');
   root.querySelector('#phagoBtn').onclick = ()=>{
     particle.style.left='96px'; particle.style.top='96px';
-    setTimeout(()=>{ particle.style.opacity='0'; blob.style.opacity='1'; const cap=root.querySelector('#phagoCaption'); if(cap) cap.textContent='The particle is engulfed into a phagosome, which fuses with a lysosome (phagolysosome) for degradation.'; }, 950);
+    setTimeout(()=>{ particle.style.opacity='0'; blob.style.opacity='1'; const cap=root.querySelector('#phagoCaption'); if(cap) cap.textContent='La partícula es englobada en un fagosoma, que se fusiona con un lisosoma (fagolisosoma) para su degradación.'; }, 950);
   };
   root.querySelector('#phagoReset').onclick=()=>{
     particle.style.transition='none'; particle.style.opacity='1'; particle.style.left='16px'; particle.style.top='20px';
     blob.style.opacity='0'; root.querySelector('#phagoCaption').textContent='';
     requestAnimationFrame(()=>{ particle.style.transition='left 1s ease,top 1s ease,opacity .4s ease .9s'; });
   };
-  const chipInfo = {'Cytokine production':'Releases TNF-α, IL-1, and IL-6 to coordinate and amplify the inflammatory response.','Debris clearance':'Phagocytoses dead cells, pathogens, and tissue debris, keeping the tissue clean.','Tissue repair':'Secretes growth factors that promote angiogenesis and remodeling after injury.','Antigen presentation':'Processes captured antigen and displays peptides on MHC II to CD4+ T cells, linking to adaptive immunity (Module 07).'};
+  const chipInfo = {'Producción de citocinas':'Libera TNF-α, IL-1 e IL-6 para coordinar y amplificar la respuesta inflamatoria.','Eliminación de detritos':'Fagocita células muertas, patógenos y detritos tisulares, manteniendo limpio el tejido.','Reparación tisular':'Secreta factores de crecimiento que promueven la angiogénesis y la remodelación tras una lesión.','Presentación de antígeno':'Procesa el antígeno capturado y exhibe péptidos en MHC II a linfocitos T CD4+, conectando con la inmunidad adaptativa (Módulo 07).'};
   root.querySelectorAll('#monoChips .pill').forEach(b=>b.onclick=()=>{ root.querySelector('#monoChipInfo').textContent = chipInfo[b.dataset.t]; });
 }
 
 function renderAPC(root){
   let sub='types', mhcIdx=0, showAdvanced=false;
   function paint(){
-    root.innerHTML = moduleHeader('Module 07 &middot; Antigen-Presenting Cells','MHC Pathways &amp; the Bridge to Adaptive Immunity')
-      + tabsBar([{id:'types',label:'APC TYPES'},{id:'present',label:'ANTIGEN PRESENTATION'},{id:'mhc',label:'MHC SIMULATOR'},{id:'bridge',label:'INNATE → ADAPTIVE'}], sub)
+    root.innerHTML = moduleHeader('Módulo 07 &middot; Células Presentadoras de Antígeno','Vías del MHC y el Puente hacia la Inmunidad Adaptativa')
+      + tabsBar([{id:'types',label:'TIPOS DE CPA'},{id:'present',label:'PRESENTACIÓN DE ANTÍGENO'},{id:'mhc',label:'SIMULADOR DE MHC'},{id:'bridge',label:'INNATA → ADAPTATIVA'}], sub)
       + '<div id="apcBody"></div>';
     wireTabs(root, t=>{ sub=t; paint(); });
     const body=root.querySelector('#apcBody');
@@ -1095,12 +1139,12 @@ function renderAPC(root){
   }
   function paintPresent(body){
     const STAGES=[
-      {name:'Antigen', desc:'A foreign antigen (protein or microbe fragment) is encountered.'},
-      {name:'Capture', desc:'The APC captures it by phagocytosis or receptor-mediated endocytosis.'},
-      {name:'Processing', desc:'Proteases (endosomal/lysosomal for exogenous material, or the proteasome for cytosolic proteins) break the antigen into fragments.'},
-      {name:'Peptide', desc:'A short peptide fragment is generated.'},
-      {name:'MHC loading', desc:'The peptide is loaded into the groove of an MHC I or MHC II molecule.'},
-      {name:'T cell', desc:'The peptide-MHC complex is displayed and recognized by a T cell receptor.'}
+      {name:'Antígeno', desc:'Se encuentra un antígeno extraño (proteína o fragmento microbiano).'},
+      {name:'Captura', desc:'La CPA lo captura por fagocitosis o endocitosis mediada por receptor.'},
+      {name:'Procesamiento', desc:'Proteasas (endosómicas/lisosómicas para material exógeno, o el proteasoma para proteínas citosólicas) fragmentan el antígeno.'},
+      {name:'Péptido', desc:'Se genera un fragmento peptídico corto.'},
+      {name:'Carga en el MHC', desc:'El péptido se carga en el surco de una molécula de MHC I o MHC II.'},
+      {name:'Célula T', desc:'El complejo péptido-MHC se exhibe y es reconocido por un receptor de célula T.'}
     ];
     body.innerHTML = '<div class="panel"><div id="presentStepper"></div></div>';
     mountStepper(body.querySelector('#presentStepper'), STAGES, (s,i)=>{
@@ -1113,15 +1157,15 @@ function renderAPC(root){
     const scenarios = pool();
     const sc = scenarios[mhcIdx % scenarios.length];
     body.innerHTML = '<div class="panel">'
-      + '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:14px;"><input type="checkbox" id="advToggle" '+(showAdvanced?'checked':'')+'> Show advanced: cross-presentation</label>'
+      + '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:14px;"><input type="checkbox" id="advToggle" '+(showAdvanced?'checked':'')+'> Mostrar avanzado: presentación cruzada</label>'
       + '<p style="font-size:15px;">'+sc.desc+'</p>'
-      + '<p style="color:var(--text-dim);">Which pathway should present this antigen?</p>'
+      + '<p style="color:var(--text-dim);">¿Por cuál vía debería presentarse este antígeno?</p>'
       + '<div class="mhc-drop" id="mhcDrop">'
-      +   '<div class="mhc-target" data-p="I"><h4>MHC I</h4><p class="side-note">&rarr; CD8+ cytotoxic T cell</p></div>'
-      +   '<div class="mhc-target" data-p="II"><h4>MHC II</h4><p class="side-note">&rarr; CD4+ helper T cell</p></div>'
+      +   '<div class="mhc-target" data-p="I"><h4>MHC I</h4><p class="side-note">&rarr; Linfocito T citotóxico CD8+</p></div>'
+      +   '<div class="mhc-target" data-p="II"><h4>MHC II</h4><p class="side-note">&rarr; Linfocito T colaborador CD4+</p></div>'
       + '</div>'
       + '<div class="explain" id="mhcExplain">'+sc.explain+'</div>'
-      + '<div class="btn-row" style="margin-top:14px;"><button class="btn sm" id="mhcNext">NEXT SCENARIO &rarr;</button></div>'
+      + '<div class="btn-row" style="margin-top:14px;"><button class="btn sm" id="mhcNext">SIGUIENTE ESCENARIO &rarr;</button></div>'
       + '</div>';
     body.querySelector('#advToggle').onchange = (e)=>{ showAdvanced=e.target.checked; mhcIdx=0; paintMHC(body); };
     let answered=false;
@@ -1137,7 +1181,7 @@ function renderAPC(root){
   }
   function paintBridge(body){
     body.innerHTML = '<div class="panel"><div id="bridgeStepper"></div>'
-      + '<p style="text-align:center;color:var(--text-dim);margin-top:10px;">This is why antigen-presenting cells bridge innate and adaptive immunity: an innate sentinel (the dendritic cell) triggers a specific, adaptive T-cell response.</p></div>';
+      + '<p style="text-align:center;color:var(--text-dim);margin-top:10px;">Por esto las células presentadoras de antígeno conectan la inmunidad innata con la adaptativa: un centinela innato (la célula dendrítica) dispara una respuesta específica y adaptativa de linfocitos T.</p></div>';
     mountStepper(body.querySelector('#bridgeStepper'), INNATE_ADAPTIVE_STAGES, (s,i)=>{
       body.querySelector('#stCanvas').innerHTML = '<div class="flow-diagram">'+INNATE_ADAPTIVE_STAGES.map((st,si)=>flowNode(st.name, si===i)+(si<INNATE_ADAPTIVE_STAGES.length-1?flowArrow():'')).join('')+'</div>';
       body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
@@ -1148,19 +1192,19 @@ function renderAPC(root){
 function orderCaseHTML(c){
   return '<p class="side-note" style="font-style:italic;">'+c.vignette+'</p>'
     + '<div class="quiz-stem">'+c.question+'</div>'
-    + '<p class="side-note">Click the steps below to place them in order.</p>'
+    + '<p class="side-note">Haz clic en los pasos de abajo para colocarlos en orden.</p>'
     + '<div class="order-pool" id="orderPool"></div>'
     + '<div class="order-slots" id="orderSlots"></div>'
-    + '<div class="btn-row"><button class="btn sm primary" id="orderCheck">CHECK ORDER</button><button class="btn sm ghost" id="orderReset">RESET</button></div>'
+    + '<div class="btn-row"><button class="btn sm primary" id="orderCheck">VERIFICAR ORDEN</button><button class="btn sm ghost" id="orderReset">REINICIAR</button></div>'
     + '<div class="explain" id="orderExplain">'+c.explain+'</div>'
-    + '<div class="btn-row" style="margin-top:10px;"><button class="btn" id="caseNext" style="display:none;">NEXT CASE &rarr;</button></div>';
+    + '<div class="btn-row" style="margin-top:10px;"><button class="btn" id="caseNext" style="display:none;">SIGUIENTE CASO &rarr;</button></div>';
 }
 function wireOrderCase(c, body, nextCase){
   let pool = shuffle(c.items.map((label,i)=>({label,i})));
   let slots = [];
   function render(){
     body.querySelector('#orderPool').innerHTML = pool.map(p=>'<button class="order-chip" data-i="'+p.i+'">'+p.label+'</button>').join('') || '<span class="side-note">&mdash;</span>';
-    body.querySelector('#orderSlots').innerHTML = slots.length ? slots.map((p,si)=>'<button class="order-chip" data-i="'+p.i+'" style="border-color:var(--accent);">'+(si+1)+'. '+p.label+'</button>').join('') : '<span class="side-note">Click steps above to place them here.</span>';
+    body.querySelector('#orderSlots').innerHTML = slots.length ? slots.map((p,si)=>'<button class="order-chip" data-i="'+p.i+'" style="border-color:var(--accent);">'+(si+1)+'. '+p.label+'</button>').join('') : '<span class="side-note">Haz clic en los pasos de arriba para colocarlos aquí.</span>';
     body.querySelectorAll('#orderPool .order-chip').forEach(b=>b.onclick=()=>{
       const idx=+b.dataset.i, item=pool.find(p=>p.i===idx);
       pool=pool.filter(p=>p.i!==idx); slots.push(item); render();
@@ -1189,8 +1233,8 @@ function renderClinical(root){
   let caseIdx=0;
   function paint(){
     const c = CLINICAL_CASES[caseIdx];
-    root.innerHTML = moduleHeader('Module 08 &middot; Clinical Connection','Short Reasoning Cases')
-      + '<div class="quiz-meta"><span>CASE '+(caseIdx+1)+' / '+CLINICAL_CASES.length+'</span><span>ACTIVE RECALL</span></div>'
+    root.innerHTML = moduleHeader('Módulo 08 &middot; Conexión Clínica','Casos Breves de Razonamiento Clínico')
+      + '<div class="quiz-meta"><span>CASO '+(caseIdx+1)+' / '+CLINICAL_CASES.length+'</span><span>RECUPERACIÓN ACTIVA</span></div>'
       + '<div class="progressline"><div class="progressline-fill" style="width:'+(caseIdx/CLINICAL_CASES.length*100)+'%"></div></div>'
       + '<div class="panel quiz-card" id="caseBody"></div>';
     const body = root.querySelector('#caseBody');
@@ -1212,10 +1256,10 @@ function renderQuiz(root){
   const missed = {};
   let usedRecently = [];
   function paint(){
-    root.innerHTML = moduleHeader('Module 09 &middot; Test Yourself','Active Recall &amp; Exam Mode')
+    root.innerHTML = moduleHeader('Módulo 09 &middot; Ponte a Prueba','Recuperación Activa y Modo Examen')
       + '<div class="btn-row" style="margin-bottom:20px;">'
-      +   '<button class="btn '+(mode==='practice'?'primary':'')+'" id="modePractice">PRACTICE (TEST YOURSELF)</button>'
-      +   '<button class="btn '+(mode==='exam'?'primary':'')+'" id="modeExam">EXAM MODE (18 QUESTIONS)</button>'
+      +   '<button class="btn '+(mode==='practice'?'primary':'')+'" id="modePractice">PRÁCTICA (PONTE A PRUEBA)</button>'
+      +   '<button class="btn '+(mode==='exam'?'primary':'')+'" id="modeExam">MODO EXAMEN (18 PREGUNTAS)</button>'
       + '</div><div id="quizArea"></div>';
     root.querySelector('#modePractice').onclick=()=>{ mode='practice'; paint(); };
     root.querySelector('#modeExam').onclick=()=>{ mode='exam'; paint(); };
@@ -1239,12 +1283,12 @@ function renderQuiz(root){
     function paintMissedList(){
       const el = area.querySelector('#missedList'); if(!el) return;
       const tags = Object.keys(missed).filter(t=>missed[t]>0);
-      el.innerHTML = tags.length ? tags.map(t=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-soft);"><span>'+t+'</span><span>&times;'+missed[t]+'</span></div>').join('') : '<p>Nothing flagged yet &mdash; keep going.</p>';
+      el.innerHTML = tags.length ? tags.map(t=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-soft);"><span>'+t+'</span><span>&times;'+missed[t]+'</span></div>').join('') : '<p>Nada marcado todavía &mdash; sigue así.</p>';
     }
     function next(){
       const q = pickPracticeQuestion();
       area.innerHTML = '<div class="grid-2"><div class="panel quiz-card" id="pInner"></div>'
-        + '<div class="panel"><h3 style="font-size:14px;">Concepts to revisit</h3><div id="missedList" style="font-size:12.5px;color:var(--text-dim);"></div></div></div>';
+        + '<div class="panel"><h3 style="font-size:14px;">Conceptos a repasar</h3><div id="missedList" style="font-size:12.5px;color:var(--text-dim);"></div></div></div>';
       paintMissedList();
       const cb = (ok)=>{ if(!ok){ missed[q.tag]=(missed[q.tag]||0)+1; } else if(missed[q.tag]){ missed[q.tag]=Math.max(0,missed[q.tag]-1); } };
       cb.next = next;
@@ -1258,7 +1302,7 @@ function renderQuiz(root){
     let idx=0; const answers=[];
     function next(){
       if(idx>=set.length) return finish();
-      area.innerHTML = '<div class="quiz-meta"><span>QUESTION '+(idx+1)+' / '+set.length+'</span><span>EXAM MODE</span></div>'
+      area.innerHTML = '<div class="quiz-meta"><span>PREGUNTA '+(idx+1)+' / '+set.length+'</span><span>MODO EXAMEN</span></div>'
         + '<div class="progressline"><div class="progressline-fill" style="width:'+(idx/set.length*100)+'%"></div></div>'
         + '<div class="panel quiz-card" id="eInner"></div>';
       const q = set[idx];
@@ -1271,10 +1315,10 @@ function renderQuiz(root){
       const pct = Math.round(correctCount/set.length*100);
       const wrong = answers.filter(a=>!a.ok);
       const topics = [...new Set(wrong.map(a=>a.q.tag))];
-      area.innerHTML = '<div class="result-hero"><div class="result-score">'+pct+'%</div><p>'+correctCount+' / '+set.length+' correct</p></div>'
-        + (topics.length ? '<div class="panel"><h3>Topics to review</h3><div class="btn-row">'+topics.map(t=>chip(t)).join('')+'</div></div>' : '<div class="panel"><p>Excellent &mdash; no weak topics detected this round.</p></div>')
-        + (wrong.length ? '<div class="panel" style="margin-top:16px;"><h3>Review</h3>'+wrong.map(a=>'<div class="review-row"><span>'+esc(a.q.stem)+'</span><span style="color:var(--bad);">Missed</span></div><p class="side-note">'+a.q.explain+'</p>').join('')+'</div>' : '')
-        + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="retakeBtn">RETAKE EXAM</button></div>';
+      area.innerHTML = '<div class="result-hero"><div class="result-score">'+pct+'%</div><p>'+correctCount+' / '+set.length+' correctas</p></div>'
+        + (topics.length ? '<div class="panel"><h3>Temas para repasar</h3><div class="btn-row">'+topics.map(t=>chip(t)).join('')+'</div></div>' : '<div class="panel"><p>Excelente &mdash; no se detectaron temas débiles en esta ronda.</p></div>')
+        + (wrong.length ? '<div class="panel" style="margin-top:16px;"><h3>Repaso</h3>'+wrong.map(a=>'<div class="review-row"><span>'+esc(a.q.stem)+'</span><span style="color:var(--bad);">Fallada</span></div><p class="side-note">'+a.q.explain+'</p>').join('')+'</div>' : '')
+        + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="retakeBtn">REPETIR EXAMEN</button></div>';
       area.querySelector('#retakeBtn').onclick = startExam;
     }
     next();
@@ -1285,13 +1329,13 @@ function renderQuiz(root){
 
 /* === INIT_START === */
 const ROUTES = { home:renderHome, mri:renderMRI, hemato:renderHemato, eryth:renderEryth, rbc:renderRBC, wbc:renderWBC, mono:renderMono, apc:renderAPC, clinical:renderClinical, quiz:renderQuiz };
-const CRUMB_LABELS = { home:'Home', mri:'Bone Marrow MRI', hemato:'Hematopoiesis', eryth:'Erythropoiesis', rbc:'Erythrocyte Physiology', wbc:'Leukocytes', mono:'Monocytes', apc:'Antigen-Presenting Cells', clinical:'Clinical Connection', quiz:'Test Yourself' };
+const CRUMB_LABELS = { home:'Inicio', mri:'Resonancia de Médula Ósea', hemato:'Hematopoyesis', eryth:'Eritropoyesis', rbc:'Fisiología del Eritrocito', wbc:'Leucocitos', mono:'Monocitos', apc:'Células Presentadoras de Antígeno', clinical:'Conexión Clínica', quiz:'Ponte a Prueba' };
 function navigate(route){ location.hash = route; }
 function renderRoute(){
   const r = (location.hash||'').replace('#','') || 'home';
   const fn = ROUTES[r] || renderHome;
   const app = document.getElementById('app');
-  document.getElementById('crumb').textContent = CRUMB_LABELS[r] || 'Home';
+  document.getElementById('crumb').textContent = CRUMB_LABELS[r] || 'Inicio';
   fn(app);
   window.scrollTo(0,0);
 }
