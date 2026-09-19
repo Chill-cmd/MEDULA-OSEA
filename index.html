@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hematopoietic Physiology Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#090c10; --bg-1:#0f141b; --bg-2:#161c25; --bg-3:#1e2632;
+  --border:#2a3341; --border-soft:#1c2430;
+  --text:#e7ecf2; --text-dim:#9aa7b8; --text-faint:#5f6b7d;
+  --accent:#35c7ff; --accent-dim:#123544;
+  --marrow:#d9a441; --marrow-red:#e0505a; --cartilage:#5fa8c9;
+  --wbc:#5b8def; --mono-c:#f2994a; --immune:#b083f0;
+  --good:#3ecf8e; --bad:#e0505a; --warn:#f2c14e;
+  --font-display:'Archivo','Arial Black',sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono','Courier New',monospace;
+  --radius:10px; --radius-lg:18px;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:var(--font-display); text-wrap:balance; margin:0 0 8px;}
+p{margin:0 0 10px; max-width:65ch;}
+a{color:var(--accent);}
+button{font-family:var(--font-body); cursor:pointer;}
+::selection{background:var(--accent); color:#04121a;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+  padding:12px 20px; background:rgba(9,12,16,.92); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border);
+}
+.brand{background:none; border:none; color:var(--text); font-family:var(--font-display); font-weight:900; font-size:14px; letter-spacing:.04em; display:flex; align-items:center; gap:8px; padding:6px 0;}
+.brand .dot{color:var(--accent);}
+.crumb{font-family:var(--font-mono); font-size:12px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; flex:1; text-align:center;}
+.readout{font-family:var(--font-mono); font-size:11px; color:var(--good); letter-spacing:.05em; display:flex; align-items:center; gap:6px;}
+.readout .led{width:6px; height:6px; border-radius:50%; background:var(--good); box-shadow:0 0 6px var(--good);}
+@media (max-width:720px){ .crumb{display:none;} }
+
+main#app{max-width:1180px; margin:0 auto; padding:24px 20px 64px;}
+
+.btn{
+  border:1px solid var(--border); background:var(--bg-2); color:var(--text);
+  border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600;
+  display:inline-flex; align-items:center; gap:8px; transition:border-color .15s, transform .1s, background .15s;
+}
+.btn:hover{border-color:var(--accent); background:var(--bg-3);}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.35; cursor:not-allowed;}
+.btn.primary{background:var(--accent); color:#04121a; border-color:var(--accent);}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn.sm{padding:6px 12px; font-size:12px;}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+
+.hero{display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; padding:20px 0 40px;}
+@media (max-width:820px){ .hero{grid-template-columns:1fr;} }
+.eyebrow{font-family:var(--font-mono); color:var(--accent); font-size:12px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px;}
+.hero h1{font-size:clamp(28px,5vw,44px); line-height:1.05;}
+.hero .sub{color:var(--text-dim); font-size:16px; max-width:52ch;}
+.skeleton-wrap{display:flex; justify-content:center;}
+.skeleton-wrap svg{width:100%; max-width:260px; filter:drop-shadow(0 0 24px rgba(53,199,255,.08));}
+
+.module-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px; margin-top:8px;}
+.mod-card{
+  text-align:left; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:18px; display:flex; flex-direction:column; gap:10px; transition:border-color .15s, transform .12s, background .15s;
+}
+.mod-card:hover{border-color:var(--accent-c,var(--accent)); background:var(--bg-2); transform:translateY(-2px);}
+.mod-card .num{font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+.mod-card .icon{width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:8px; background:var(--bg-3); color:var(--accent-c,var(--accent));}
+.mod-card h3{font-size:16px; margin:0;}
+.mod-card p{font-size:12.5px; color:var(--text-dim); margin:0;}
+
+.module-header{margin-bottom:20px;}
+.module-header .kicker{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);}
+.module-header h1{font-size:clamp(22px,4vw,32px); margin:2px 0 6px;}
+
+.disclaimer{
+  display:flex; gap:10px; align-items:flex-start; background:var(--bg-1); border:1px solid var(--border-soft);
+  border-left:3px solid var(--warn); border-radius:8px; padding:12px 14px; font-size:12.5px; color:var(--text-dim); margin-bottom:20px;
+}
+.disclaimer b{color:var(--warn); font-weight:600;}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--border); margin-bottom:22px; padding-bottom:0;}
+.tab{background:none; border:none; color:var(--text-dim); font-size:13px; font-weight:600; padding:10px 14px; border-bottom:2px solid transparent; font-family:var(--font-body);}
+.tab.active{color:var(--text); border-color:var(--accent);}
+.tab:hover{color:var(--text);}
+
+.panel{background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px;}
+.panel + .panel{margin-top:16px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+@media (max-width:720px){ .grid-2,.grid-3{grid-template-columns:1fr;} }
+
+.chip{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:11px; padding:3px 9px; border-radius:20px; background:var(--bg-3); color:var(--text-dim); border:1px solid var(--border);}
+.chip.source{color:var(--accent);border-color:var(--accent-dim);}
+.chip.cd4{color:var(--wbc); border-color:var(--wbc);}
+.chip.cd8{color:var(--marrow-red); border-color:var(--marrow-red);}
+
+.pbar{height:8px; border-radius:6px; background:var(--bg-3); overflow:hidden; border:1px solid var(--border-soft);}
+.pbar-fill{height:100%; border-radius:6px; transition:width .5s ease;}
+.stat-row{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em;}
+
+.compare-box{border:1px solid var(--border); border-radius:12px; padding:16px; background:var(--bg-2);}
+.compare-box h4{font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+.swatch{width:11px; height:11px; border-radius:3px; display:inline-block;}
+
+.slider-block{margin:18px 0;}
+.slider-block label{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); margin-bottom:8px; font-family:var(--font-mono);}
+input[type=range]{width:100%; accent-color:var(--accent); height:4px;}
+.age-ticks{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-top:6px;}
+
+.stepper-shell{display:flex; flex-direction:column; align-items:center; gap:18px;}
+.stage-dots{display:flex; gap:6px; flex-wrap:wrap; justify-content:center;}
+.dot{width:9px; height:9px; border-radius:50%; background:var(--bg-3); border:1px solid var(--border);}
+.dot.active{background:var(--accent); border-color:var(--accent);}
+.dot.done{background:var(--text-faint);}
+.stepper-controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+.stage-caption{text-align:center; max-width:520px;}
+.stage-caption h3{margin-bottom:4px;}
+.stage-caption p{color:var(--text-dim); font-size:13px; margin:0 auto;}
+
+.cell-canvas{display:flex; align-items:center; justify-content:center; min-height:220px;}
+
+.why-box{background:var(--bg-2); border:1px dashed var(--border); border-radius:10px; padding:14px; margin-top:14px; font-size:13px; color:var(--text-dim); display:none;}
+.why-box.open{display:block;}
+
+.select-grid{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;}
+.pill{background:var(--bg-2); border:1px solid var(--border); border-radius:30px; padding:9px 16px; font-size:13px; font-weight:600; color:var(--text-dim); display:flex; align-items:center; gap:8px;}
+.pill.active{color:#04121a; border-color:transparent;}
+.pill .swatch-dot{width:9px; height:9px; border-radius:50%;}
+
+.vessel{position:relative; background:linear-gradient(180deg,#0c1620,#0a0f16); border:1px solid var(--border); border-radius:14px; padding:26px 20px; overflow:hidden;}
+.vessel-lane{position:relative; height:120px; border-top:2px dotted var(--border); border-bottom:2px dotted var(--border); margin:20px 0;}
+.endo-cell{position:absolute; bottom:0; width:34px; height:16px; background:var(--bg-3); border:1px solid var(--border); border-radius:3px 3px 0 0;}
+.leuko-token{position:absolute; width:26px; height:26px; border-radius:50%; background:var(--wbc); box-shadow:0 0 14px rgba(91,141,239,.5); transition:left 1s cubic-bezier(.4,0,.2,1), top .8s ease, transform .6s ease; display:flex; align-items:center; justify-content:center; font-size:12px;}
+
+.mhc-drop{display:flex; gap:16px; margin-top:16px; flex-wrap:wrap;}
+.mhc-target{flex:1; min-width:180px; border:2px dashed var(--border); border-radius:12px; padding:20px; text-align:center; background:var(--bg-2);}
+.mhc-target h4{margin-bottom:4px;}
+.mhc-target.correct{border-color:var(--good); background:rgba(62,207,142,.08);}
+.mhc-target.wrong{border-color:var(--bad); background:rgba(224,80,90,.08);}
+
+.quiz-card{max-width:640px; margin:0 auto;}
+.quiz-stem{font-size:16px; font-weight:600; margin-bottom:18px;}
+.option{display:block; width:100%; text-align:left; background:var(--bg-2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:10px; font-size:14px; color:var(--text);}
+.option:hover:not(:disabled){border-color:var(--accent);}
+.option.correct{border-color:var(--good); background:rgba(62,207,142,.1); color:var(--good);}
+.option.wrong{border-color:var(--bad); background:rgba(224,80,90,.1); color:var(--bad);}
+.option:disabled{cursor:default;}
+.explain{background:var(--bg-2); border-left:3px solid var(--accent); border-radius:8px; padding:12px 14px; font-size:13px; color:var(--text-dim); margin-top:14px; display:none;}
+.explain.open{display:block;}
+.quiz-meta{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-bottom:10px; text-transform:uppercase;}
+.progressline{height:4px; background:var(--bg-3); border-radius:2px; margin-bottom:24px; overflow:hidden;}
+.progressline-fill{height:100%; background:var(--accent);}
+
+.result-hero{text-align:center; padding:30px 0;}
+.result-score{font-family:var(--font-display); font-size:56px; font-weight:900; color:var(--accent);}
+.review-row{display:flex; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--border-soft); font-size:13px;}
+
+.order-pool{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;}
+.order-slots{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; min-height:44px; padding:8px; border:1px dashed var(--border); border-radius:10px;}
+.order-chip{background:var(--bg-3); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600;}
+
+table.comp-table{width:100%; border-collapse:collapse; font-size:13px;}
+table.comp-table td,table.comp-table th{padding:8px 6px; border-bottom:1px solid var(--border-soft); text-align:left;}
+table.comp-table th{color:var(--text-faint); font-family:var(--font-mono); font-size:11px; text-transform:uppercase;}
+
+.side-note{font-size:12px; color:var(--text-faint); margin-top:10px;}
+.flow-diagram{display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; padding:20px 0;}
+.flow-node{background:var(--bg-2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; font-size:12.5px; font-weight:600; text-align:center;}
+.flow-node.hot{border-color:var(--accent); box-shadow:0 0 14px rgba(53,199,255,.25);}
+.flow-arrow{color:var(--text-faint); font-size:18px;}
+
+footer.appfoot{text-align:center; color:var(--text-faint); font-size:11.5px; font-family:var(--font-mono); padding:30px 20px 50px;}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="brand" id="btnHome" onclick="navigate('home')"><span class="dot">&#9673;</span> HEMATOPOIETIC PHYSIOLOGY LAB</button>
+  <div class="crumb" id="crumb">Home</div>
+  <div class="readout"><span class="led"></span> SIM READY</div>
+</header>
+<main id="app"></main>
+<footer class="appfoot">Educational simulator &middot; not a diagnostic tool &middot; Medicina &middot; built for active recall</footer>
+<script>
+/* === DATA_START === */
+const SRC_MRI = "Londoño MA, Vallejo JM, Manzano AC. Rev Colomb Radiol. 2015;26(2):4206-12";
+
+const MARROW_COMPOSITION = {
+  red:{
+    name:"Red marrow", cellPct:60, fatCellPct:40,
+    chem:{fat:40, water:40, protein:20},
+    function:"Site of active hematopoiesis. Richly vascularized to support cell release into sinusoids.",
+    color:"var(--marrow-red)"
+  },
+  yellow:{
+    name:"Yellow marrow", cellPct:5, fatCellPct:95,
+    chem:{fat:80, water:15, protein:5},
+    function:"Predominantly adipose. Hematopoietic function is minimal; poorly vascularized compared to red marrow.",
+    color:"var(--marrow)"
+  }
+};
+
+const MRI_SEQUENCES = {
+  T1:{
+    label:"T1-weighted",
+    yellow:{gray:"#f2f2f2", desc:"High signal — fat shortens T1, so yellow marrow looks as bright as subcutaneous fat."},
+    red:{gray:"#5c5c5c", desc:"Intermediate-low signal from its high cellularity and water content, but usually still brighter than muscle or intervertebral discs."},
+    why:"T1-weighted sequences are highly sensitive to fat. Fat's short T1 relaxation time produces high signal, while the greater cellular and water content of red marrow lowers its relative signal. This is the sequence with the most contrast between red and yellow marrow."
+  },
+  T2:{
+    label:"T2-weighted",
+    yellow:{gray:"#d8d8d8", desc:"High signal, similar to T1."},
+    red:{gray:"#9a9a9a", desc:"Intermediate signal — still lower than fat, but the gap between red and yellow marrow is less pronounced than on T1."},
+    why:"Both fat and water contribute substantial T2 signal, so the relaxation-time difference between red and yellow marrow is smaller on T2 than on T1. The fat/red-marrow contrast is real but less dramatic."
+  },
+  STIR:{
+    label:"STIR (fat-suppressed)",
+    yellow:{gray:"#161616", desc:"Signal is nulled — STIR suppresses fat, so yellow marrow turns dark."},
+    red:{gray:"#b8b8b8", desc:"Relatively higher signal once fat is suppressed, because red marrow's water/cellular content is not nulled."},
+    why:"STIR (Short TI Inversion Recovery) uses an inversion pulse timed to null fat signal. With fat suppressed, red marrow can appear relatively bright — this normal finding must not be mistaken for contrast enhancement on a gadolinium T1 sequence, which is a different phenomenon entirely."
+  }
+};
+
+const AGE_STAGES = [
+  {
+    id:"fetal", label:"Fetal",
+    text:"Diaphyses and metaphyses of long bones show low T1 signal because red marrow predominates. Unossified epiphyses are cartilaginous and show intermediate T1 signal from their high water content.",
+    regions:{skull:"cartilage", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"red", humDiaR:"red", femProxL:"red", femProxR:"red", femDiaL:"red", femDiaR:"red", handL:"cartilage", handR:"cartilage", footL:"cartilage", footR:"cartilage"}
+  },
+  {
+    id:"newborn", label:"Newborn",
+    text:"As epiphyses begin to ossify, fatty marrow appears in the new ossification centers as high T1 signal foci. Phalanges and metatarsals remain high signal on T2 from abundant cartilage water.",
+    regions:{skull:"red", spine:"red", chest:"red", pelvis:"red", humProxL:"redyellow", humProxR:"redyellow", humDiaL:"red", humDiaR:"red", femProxL:"redyellow", femProxR:"redyellow", femDiaL:"red", femDiaR:"red", handL:"red", handR:"red", footL:"red", footR:"red"}
+  },
+  {
+    id:"y1", label:"1 year",
+    text:"Marrow conversion begins in the hand and foot phalanges near the end of the first year, completing around age 1. Conversion also starts in the femoral diaphyses.",
+    regions:{skull:"red", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"redyellow", humDiaR:"redyellow", femProxL:"red", femProxR:"red", femDiaL:"redyellow", femDiaR:"redyellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
+  },
+  {
+    id:"y10", label:"10 years",
+    text:"By age 10, fatty marrow occupies most diaphyseal regions of the limbs and skull; red marrow persists only in the metaphyses. The axial skeleton (spine, thorax, pelvis) still holds mostly red marrow through the first decade, converting later on a less predictable pattern.",
+    regions:{skull:"yellow", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"yellow", humDiaR:"yellow", femProxL:"red", femProxR:"red", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
+  },
+  {
+    id:"adol", label:"10–25y (Adolescent)",
+    text:"Fatty marrow signal now predominates throughout the extremities, but residual red marrow remains in the femoral and humeral metaphyses — seen as relatively higher T1 signal in the diaphyses where fat now dominates. Axial conversion continues, unevenly.",
+    regions:{skull:"yellow", spine:"redyellow", chest:"red", pelvis:"red", humProxL:"redyellow", humProxR:"redyellow", humDiaL:"yellow", humDiaR:"yellow", femProxL:"redyellow", femProxR:"redyellow", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
+  },
+  {
+    id:"adult", label:"25y+ (Adult)",
+    text:"The adult pattern is reached around age 25: red marrow persists in the axial skeleton, sternum, ribs, and the proximal femur and humerus. A low-T1-signal band (growth cartilage remnant) still separates epiphysis from diaphysis, thinning to a residual line once it closes.",
+    regions:{skull:"yellow", spine:"red", chest:"red", pelvis:"red", humProxL:"red", humProxR:"red", humDiaL:"yellow", humDiaR:"yellow", femProxL:"red", femProxR:"red", femDiaL:"yellow", femDiaR:"yellow", handL:"yellow", handR:"yellow", footL:"yellow", footR:"yellow"}
+  }
+];
+const REGION_COLOR = {red:"var(--marrow-red)", yellow:"var(--marrow)", redyellow:"#c77a5a", cartilage:"var(--cartilage)"};
+
+const HEMATO_TREE = {
+  id:"hsc", name:"Hematopoietic Stem Cell",
+  info:{origin:"Resides in the red marrow hematopoietic niche, anchored to stromal cells and sinusoidal endothelium.", function:"Pluripotent and self-renewing; gives rise to all blood cell lineages.", location:"Red bone marrow (axial skeleton and proximal long bones in adults).", characteristics:"Rare, quiescent most of the time, low mitotic rate; asymmetric division maintains the stem cell pool.", fate:"Differentiates into myeloid or lymphoid progenitors under cytokine signaling (SCF, IL-3, TPO, and others)."},
+  children:[
+    {id:"myeloid", name:"Myeloid Progenitor", branch:"myeloid",
+      info:{origin:"Derived from the HSC (common myeloid progenitor / CFU-GEMM).", function:"Commits to erythroid, granulocytic, monocytic, and megakaryocytic fates.", location:"Red marrow.", characteristics:"Responds to SCF, IL-3, GM-CSF.", fate:"Branches into erythroid, granulocyte/monocyte, and megakaryocyte lines."},
+      children:[
+        {id:"ery", name:"Erythrocyte", info:{origin:"Via BFU-E → CFU-E → erythroblast stages.", function:"Carries O2 and CO2 in the blood.", location:"Peripheral blood.", characteristics:"Anucleate, biconcave, ~120-day lifespan.", fate:"Removed by splenic/hepatic macrophages at senescence."}},
+        {id:"plt", name:"Platelets", info:{origin:"Cytoplasmic fragments of the megakaryocyte.", function:"Primary hemostasis — form the platelet plug and support coagulation.", location:"Peripheral blood.", characteristics:"Anucleate, ~7-10 day lifespan.", fate:"Cleared by the spleen and reticuloendothelial system."}},
+        {id:"neu", name:"Neutrophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"First responder phagocyte against bacteria.", location:"Blood, then tissues during inflammation.", characteristics:"Multilobed nucleus, most abundant leukocyte.", fate:"Short-lived; dies at the infection site forming pus."}},
+        {id:"eos", name:"Eosinophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"Defense against parasites; modulates allergic reactions.", location:"Blood and mucosal tissues.", characteristics:"Bilobed nucleus, eosinophilic (red-orange) granules.", fate:"Migrates into tissue, degranulates against large parasites."}},
+        {id:"bas", name:"Basophil", info:{origin:"Granulocyte-monocyte progenitor.", function:"Releases histamine and heparin in immediate hypersensitivity.", location:"Blood (least abundant granulocyte).", characteristics:"Nucleus often obscured by dense purple-blue granules.", fate:"Contributes to allergic and anti-parasitic responses."}},
+        {id:"mono", name:"Monocyte", info:{origin:"Granulocyte-monocyte progenitor.", function:"Circulating precursor of tissue macrophages and some dendritic cells.", location:"Blood, then tissues.", characteristics:"Largest leukocyte, kidney-shaped nucleus.", fate:"Differentiates into a macrophage or monocyte-derived dendritic cell."}}
+      ]},
+    {id:"lymphoid", name:"Lymphoid Progenitor", branch:"lymphoid",
+      info:{origin:"Derived from the HSC (common lymphoid progenitor).", function:"Gives rise to the cells of adaptive immunity plus NK cells.", location:"Red marrow, with further maturation elsewhere (thymus for T cells).", characteristics:"Responds to IL-7 and related cytokines.", fate:"Branches into T, B, and NK lineages."},
+      children:[
+        {id:"tcell", name:"T Lymphocyte", info:{origin:"Common lymphoid progenitor; matures in the thymus.", function:"Cell-mediated immunity — CD8+ cytotoxic killing, CD4+ helper coordination.", location:"Blood, lymph nodes, thymus (maturation).", characteristics:"Expresses a T-cell receptor plus CD4 or CD8.", fate:"Differentiates into effector or memory T cells after antigen recognition."}},
+        {id:"bcell", name:"B Lymphocyte", info:{origin:"Common lymphoid progenitor; matures in the marrow.", function:"Humoral immunity — differentiates into antibody-secreting plasma cells; also acts as an antigen-presenting cell.", location:"Blood, lymph nodes, spleen.", characteristics:"Surface immunoglobulin (B-cell receptor).", fate:"Becomes a plasma cell or memory B cell after activation."}},
+        {id:"nk", name:"NK Cell", info:{origin:"Common lymphoid progenitor.", function:"Innate cytotoxicity against virus-infected and tumor cells, without prior sensitization.", location:"Blood and tissues.", characteristics:"Large granular lymphocyte; lacks a rearranged antigen receptor.", fate:"Kills targets lacking normal MHC I display (“missing self”)."}}
+      ]}
+  ]
+};
+
+const ERY_STAGES = [
+  {id:"hsc", name:"Hematopoietic Stem Cell", size:70, nucleus:60, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Pluripotent marrow resident; not yet committed to any lineage."},
+  {id:"myprog", name:"Myeloid Progenitor", size:66, nucleus:56, chroma:"open", hb:0, cyto:"#7a8aa0", desc:"Commits toward the myeloid branch, including the erythroid fate."},
+  {id:"bfue", name:"BFU-E", size:60, nucleus:50, chroma:"open", hb:0, cyto:"#6f84a8", desc:"Burst-forming unit–erythroid. Early progenitor, responds mainly to SCF/IL-3, weakly to EPO."},
+  {id:"cfue", name:"CFU-E", size:54, nucleus:44, chroma:"open", hb:5, cyto:"#6a7fb0", desc:"Colony-forming unit–erythroid. Highly EPO-responsive; the main target of erythropoietin."},
+  {id:"proery", name:"Proerythroblast", size:50, nucleus:40, chroma:"fine", hb:8, cyto:"#4d6fc7", desc:"First morphologically recognizable erythroid precursor. Large nucleus with fine chromatin, deeply basophilic cytoplasm begins."},
+  {id:"baso", name:"Basophilic erythroblast", size:42, nucleus:32, chroma:"coarser", hb:20, cyto:"#4457b3", desc:"Smaller cell, chromatin condensing further. Cytoplasm deeply basophilic from abundant ribosomes synthesizing globin."},
+  {id:"poly", name:"Polychromatophilic erythroblast", size:34, nucleus:22, chroma:"clumped", hb:50, cyto:"#8a6f9e", desc:"Cytoplasm turns mixed blue-pink as hemoglobin accumulates alongside residual ribosomes."},
+  {id:"ortho", name:"Orthochromatic erythroblast", size:26, nucleus:12, chroma:"pyknotic", hb:80, cyto:"#c96a7a", desc:"Small pyknotic nucleus, eosinophilic (pink) cytoplasm dominated by hemoglobin. Final stage before nuclear expulsion."},
+  {id:"retic", name:"Reticulocyte", size:22, nucleus:0, chroma:"none", hb:95, cyto:"#d9727a", desc:"Enucleated. Residual ribosomal RNA (visible as a reticulum with supravital stain) still allows some hemoglobin synthesis. Matures in the blood over 1–2 days."},
+  {id:"mature", name:"Erythrocyte", size:20, nucleus:0, chroma:"none", hb:100, cyto:"#e0505a", desc:"Mature biconcave, anucleate erythrocyte, fully loaded with hemoglobin. Circulates for about 120 days."}
+];
+
+const WBC_TYPES = [
+  {id:"neu", name:"Neutrophil", color:"var(--wbc)", nucleus:"multilobed", granule:"#e7ecf2",
+   morphology:"Multilobed nucleus (3-5 lobes), fine neutral (lilac) granules.",
+   func:"First-responder phagocyte; engulfs and kills bacteria via oxidative burst and granule enzymes.",
+   role:"Most abundant circulating leukocyte (~50-70% of the differential); central to acute inflammation.",
+   fate:"Short-lived (hours to ~1-2 days); dies at the site of infection, contributing to pus.",
+   clinical:"Neutrophilia is a classic marker of acute bacterial infection."},
+  {id:"eos", name:"Eosinophil", color:"#e07a3f", nucleus:"bilobed", granule:"#e07a3f",
+   morphology:"Bilobed nucleus, large eosinophilic (red-orange) granules.",
+   func:"Defends against multicellular parasites; releases major basic protein; modulates allergic/hypersensitivity reactions.",
+   role:"Minor fraction of leukocytes; expands during parasitic infection or allergy.",
+   fate:"Migrates into mucosal tissues; degranulates on contact with large pathogens.",
+   clinical:"Eosinophilia suggests parasitic infection, asthma, or allergic disease."},
+  {id:"bas", name:"Basophil", color:"#7a5fc9", nucleus:"obscured", granule:"#7a5fc9",
+   morphology:"Nucleus often obscured by dense, coarse purple-blue granules.",
+   func:"Releases histamine and heparin; participates in immediate (type I) hypersensitivity.",
+   role:"Least abundant granulocyte in blood; tissue counterpart is the mast cell.",
+   fate:"Degranulates rapidly upon IgE cross-linking.",
+   clinical:"Central mediator of allergic and anaphylactic reactions."},
+  {id:"lym", name:"Lymphocyte", color:"var(--immune)", nucleus:"round-large", granule:"none",
+   morphology:"Large round nucleus, scant cytoplasm rim.",
+   func:"T cells mediate cellular immunity; B cells produce antibodies; NK cells provide innate cytotoxicity.",
+   role:"Second most abundant leukocyte; the core of adaptive immunity.",
+   fate:"Long-lived; memory subsets can persist for years.",
+   clinical:"Lymphocytosis is typical of viral infections; lymphopenia can reflect immunosuppression."},
+  {id:"mon", name:"Monocyte", color:"var(--mono-c)", nucleus:"kidney-shaped", granule:"none",
+   morphology:"Largest leukocyte; kidney/horseshoe-shaped nucleus, abundant gray-blue cytoplasm.",
+   func:"Circulating precursor that becomes a tissue macrophage or dendritic cell.",
+   role:"Bridges innate phagocytic defense and antigen presentation to adaptive immunity.",
+   fate:"Leaves the blood within 1-3 days to seed tissues.",
+   clinical:"Monocytosis can be seen in chronic infection and some hematologic disorders."}
+];
+
+const EXTRAV_STAGES = [
+  {id:"margin", name:"Margination", desc:"Altered blood flow and endothelial activation cause leukocytes to shift from the axial stream to the vessel wall.", tag:null},
+  {id:"roll", name:"Rolling", desc:"Selectins (E-/P-selectin on endothelium, sialyl-Lewis X on the leukocyte) form weak, transient bonds — the leukocyte rolls along the wall.", tag:"Selectins"},
+  {id:"activate", name:"Activation", desc:"Endothelium-displayed chemokines trigger inside-out signaling that switches leukocyte integrins to a high-affinity state.", tag:null},
+  {id:"adhere", name:"Adhesion", desc:"High-affinity integrins (LFA-1, VLA-4) bind ICAM-1/VCAM-1 on the endothelium, producing firm arrest.", tag:"Integrins"},
+  {id:"diapedesis", name:"Diapedesis", desc:"The leukocyte squeezes between endothelial cell junctions (PECAM-1/CD31 mediated) into the tissue.", tag:null},
+  {id:"chemotaxis", name:"Chemotaxis", desc:"The leukocyte migrates directionally along a chemokine/chemoattractant gradient toward the site of infection or injury.", tag:null}
+];
+
+const MONO_STAGES = [
+  {id:"blood", name:"Monocyte in blood", desc:"Circulates for 1–3 days as a surveillance phagocyte, ready to respond to inflammatory signals."},
+  {id:"migrate", name:"Endothelial migration", desc:"Follows the same rolling → adhesion → diapedesis sequence as other leukocytes to enter tissue."},
+  {id:"tissue", name:"Tissue", desc:"Once in the tissue, the monocyte encounters local cytokines and microbial signals that direct its differentiation."},
+  {id:"macro", name:"Macrophage / dendritic cell", desc:"Differentiates into a resident-type macrophage (or monocyte-derived dendritic cell), taking on phagocytic and antigen-presenting roles."}
+];
+
+const APC_TYPES = [
+  {id:"dc", name:"Dendritic Cell", role:"The most potent professional APC; captures antigen in peripheral tissue and migrates to lymph nodes to activate naive T cells.", mhc:"MHC I and II; uniquely capable of cross-presentation."},
+  {id:"mac", name:"Macrophage", role:"Phagocytoses pathogens and debris; presents processed peptides mainly to already-differentiated effector/memory T cells locally.", mhc:"MHC I and II."},
+  {id:"bc", name:"B Lymphocyte", role:"Captures antigen via its B-cell receptor with high specificity; presents to helper T cells to obtain the T-cell help needed for antibody class switching.", mhc:"MHC I and II."}
+];
+
+const MHC_SCENARIOS = [
+  {id:1, desc:"A viral protein is synthesized in the cytoplasm of an infected epithelial cell.", correct:"I", explain:"Endogenous/cytosolic proteins are degraded by the proteasome, transported by TAP into the ER, and loaded onto MHC I for CD8+ cytotoxic T cell surveillance."},
+  {id:2, desc:"An extracellular bacterium is phagocytosed by a macrophage.", correct:"II", explain:"Exogenous antigens captured by phagocytosis are degraded in the endolysosomal pathway and loaded onto MHC II for CD4+ helper T cells."},
+  {id:3, desc:"A self-protein is degraded during normal intracellular turnover.", correct:"I", explain:"MHC I continuously displays a sample of intracellular (mostly self) proteins on virtually all nucleated cells, allowing immune surveillance for anything abnormal."},
+  {id:4, desc:"A tumor antigen is synthesized inside a cancer cell.", correct:"I", explain:"Being an endogenous/cytosolic protein, it follows the proteasome/TAP/MHC I route, allowing CD8+ T cells to recognize and kill the tumor cell."},
+  {id:5, desc:"A toxin is taken up by receptor-mediated endocytosis into a dendritic cell.", correct:"II", explain:"Endocytosed extracellular material is processed in endosomes/lysosomes and presented via MHC II to CD4+ T cells."},
+  {id:6, desc:"[Advanced] A dendritic cell captures a viral antigen from dying infected cells and cross-presents it.", correct:"I", explain:"Cross-presentation is the exception: dendritic cells can route exogenous antigen onto MHC I, activating CD8+ T cells even when the DC itself was never infected."}
+];
+
+const INNATE_ADAPTIVE_STAGES = [
+  {id:"pathogen", name:"Pathogen", desc:"A pathogen breaches a peripheral tissue barrier."},
+  {id:"dc", name:"Dendritic Cell", desc:"A resident dendritic cell, an innate sentinel, encounters the pathogen."},
+  {id:"capture", name:"Antigen Capture", desc:"The dendritic cell captures and processes the antigen, then matures — upregulating MHC and costimulatory molecules (CD80/86)."},
+  {id:"node", name:"Lymph Node", desc:"The mature dendritic cell migrates via lymphatics to the regional lymph node."},
+  {id:"present", name:"Antigen Presentation", desc:"It presents processed peptide via MHC I or II to circulating naive T cells."},
+  {id:"activation", name:"T Cell Activation", desc:"TCR recognition plus costimulation activates and clonally expands the specific T cell."},
+  {id:"adaptive", name:"Adaptive Immunity", desc:"Effector T cells and B-cell help drive a targeted adaptive response — the dendritic cell has bridged innate and adaptive immunity."}
+];
+
+const CLINICAL_CASES = [
+  {id:"c1", type:"mcq",
+   vignette:"A 45-year-old climbs to a 4500 m altitude camp and develops mild dyspnea. Pulse oximetry reads 88%.",
+   question:"What happens to EPO production?",
+   options:["EPO decreases","EPO increases","EPO does not change"], correct:1,
+   explain:"Tissue hypoxia stimulates peritubular renal cells (via the HIF pathway) to increase erythropoietin synthesis, raising the erythroid stimulus."},
+  {id:"c2", type:"mcq",
+   vignette:"A patient has advanced chronic kidney disease (eGFR 15 mL/min).",
+   question:"How is erythropoiesis affected?",
+   options:["It increases from greater EPO filtration","It decreases from reduced renal EPO synthesis","It is unaffected","It increases from iron retention"], correct:1,
+   explain:"Damaged renal parenchyma produces less EPO, lowering the erythroid stimulus — the mechanism behind the anemia of chronic kidney disease."},
+  {id:"c3", type:"order",
+   vignette:"A neutrophil must leave the bloodstream to reach a focus of infection.",
+   question:"Arrange these events in the correct order.",
+   items:["Rolling","Adhesion","Diapedesis","Chemotaxis"], correctOrder:[0,1,2,3],
+   explain:"Full sequence: margination → rolling (selectins) → activation → adhesion (integrins) → diapedesis → chemotaxis toward the chemokine gradient."},
+  {id:"c4", type:"mcq",
+   vignette:"A dendritic cell captures an extracellular bacterium and presents a derived peptide bound to MHC II on its surface.",
+   question:"Which lymphocyte mainly recognizes this presentation?",
+   options:["CD4+ T lymphocyte","CD8+ T lymphocyte"], correct:0,
+   explain:"MHC II is recognized by CD4+ helper T cells, consistent with the exogenous/phagocytic route of antigen processing."}
+];
+
+const QUESTION_BANK = [
+  {tag:"marrow", stem:"What is the approximate cellular composition of red bone marrow?", options:["95% adipocytes / 5% hematopoietic cells","60% hematopoietic cells / 40% adipocytes","80% water / 20% protein","100% hematopoietic cells"], correct:1, explain:"Red marrow is about 60% hematopoietic cells and 40% adipocytes (Londoño et al., 2015)."},
+  {tag:"marrow", stem:"What is the approximate chemical composition of yellow marrow?", options:["40% fat / 40% water / 20% protein","80% fat / 15% water / 5% protein","20% fat / 60% water / 20% protein","100% fat"], correct:1, explain:"Yellow marrow is chemically about 80% fat, 15% water, and 5% protein."},
+  {tag:"marrow", stem:"On T1-weighted MRI, yellow (fatty) marrow signal is:", options:["Low, similar to muscle","High, similar to subcutaneous fat","Absent","Identical to water"], correct:1, explain:"Fat's short T1 relaxation time gives yellow marrow high T1 signal, resembling subcutaneous fat."},
+  {tag:"marrow", stem:"What does a STIR sequence accomplish?", options:["Enhances contrast with gadolinium","Suppresses fat signal","Eliminates water signal","Increases cortical bone signal"], correct:1, explain:"STIR (Short TI Inversion Recovery) nulls the fat signal, making red marrow relatively more conspicuous."},
+  {tag:"marrow", stem:"In an adult (>25 years), where does red marrow predominate?", options:["Diaphyses of the limb long bones","Axial skeleton, sternum, ribs, and proximal femur/humerus","Phalanges of the hands/feet","Exclusively the skull"], correct:1, explain:"The adult pattern retains red marrow in the axial skeleton, sternum, ribs, and the proximal femur and humerus."},
+  {tag:"marrow", stem:"Around what age is the adult marrow distribution pattern typically reached?", options:["5 years","10 years","25 years","60 years"], correct:2, explain:"The adult marrow pattern is generally reached by about 25 years of age."},
+  {tag:"eryth", stem:"Which is the first morphologically recognizable erythroid precursor?", options:["BFU-E","CFU-E","Proerythroblast","Reticulocyte"], correct:2, explain:"The proerythroblast is the first stage identifiable by standard morphology in the erythroid line."},
+  {tag:"eryth", stem:"Between which two stages does enucleation occur?", options:["Proerythroblast → basophilic erythroblast","Orthochromatic erythroblast → reticulocyte","Reticulocyte → erythrocyte","BFU-E → CFU-E"], correct:1, explain:"The orthochromatic erythroblast expels its pyknotic nucleus to become a reticulocyte."},
+  {tag:"eryth", stem:"Which erythroid progenitor is most sensitive to EPO?", options:["BFU-E","CFU-E","Proerythroblast","HSC"], correct:1, explain:"CFU-E is the main EPO-responsive target, more so than the earlier BFU-E."},
+  {tag:"eryth", stem:"What happens to EPO during tissue hypoxia?", options:["It decreases","It increases","No change","It is destroyed"], correct:1, explain:"Hypoxia upregulates renal EPO synthesis via the HIF pathway, stimulating erythropoiesis."},
+  {tag:"eryth", stem:"A marked drop in renal function typically causes:", options:["Increased EPO and erythropoiesis","Decreased EPO and erythropoiesis (anemia of CKD)","No change in erythropoiesis","Isolated iron deficiency"], correct:1, explain:"Reduced renal mass/function lowers EPO synthesis, producing the characteristic anemia of chronic kidney disease."},
+  {tag:"eryth", stem:"Which feature best describes a reticulocyte?", options:["Fully mature, no residual RNA","Anucleate with residual ribosomal RNA, matures in 1-2 days in blood","Still nucleated","Found only in marrow, never in blood"], correct:1, explain:"Reticulocytes are enucleated but retain ribosomal RNA (the “reticulum”), maturing in the peripheral blood over 1-2 days."},
+  {tag:"rbc", stem:"What is the average lifespan of a mature erythrocyte?", options:["30 days","120 days","1 year","10 days"], correct:1, explain:"Mature erythrocytes circulate for approximately 120 days before removal."},
+  {tag:"rbc", stem:"Where are senescent erythrocytes mainly removed?", options:["Kidney","Spleen and liver (macrophages)","Lungs","Bone marrow only"], correct:1, explain:"Splenic and hepatic macrophages phagocytose aged erythrocytes and recycle their iron."},
+  {tag:"rbc", stem:"The biconcave shape of the erythrocyte mainly serves to:", options:["Increase surface area and deformability for gas exchange","Store oxygen reserves","Anchor the nucleus","Increase rigidity"], correct:0, explain:"The biconcave disc increases surface-to-volume ratio and allows the deformability needed to traverse capillaries."},
+  {tag:"rbc", stem:"A rise in CO2 / fall in pH shifts the oxyhemoglobin curve:", options:["Left, increasing O2 affinity","Right, decreasing O2 affinity (Bohr effect)","It has no effect","It abolishes cooperative binding"], correct:1, explain:"The Bohr effect: more CO2/lower pH shifts the curve right, favoring O2 release to metabolically active tissue."},
+  {tag:"rbc", stem:"Where does the carbonic anhydrase reaction (CO2 + H2O ↔ H2CO3) mainly occur?", options:["In plasma","Inside the erythrocyte","In the alveolar epithelium","In the renal tubule only"], correct:1, explain:"Carbonic anhydrase is abundant inside the erythrocyte, rapidly converting CO2 and water to carbonic acid."},
+  {tag:"rbc", stem:"In the chloride shift, as HCO3⁻ leaves the erythrocyte for plasma:", options:["Na+ enters to balance charge","Cl⁻ enters via the band 3 exchanger","K+ leaves the cell","Nothing else moves"], correct:1, explain:"The band 3 (AE1) anion exchanger swaps outgoing HCO3⁻ for incoming Cl⁻, preserving electroneutrality."},
+  {tag:"wbc", stem:"Which is the most abundant circulating leukocyte?", options:["Eosinophil","Basophil","Neutrophil","Monocyte"], correct:2, explain:"Neutrophils make up roughly 50-70% of the normal leukocyte differential."},
+  {tag:"wbc", stem:"A bilobed nucleus with red-orange granules, active against parasites, describes the:", options:["Neutrophil","Eosinophil","Basophil","Lymphocyte"], correct:1, explain:"Eosinophils have a characteristic bilobed nucleus and eosinophilic granules, and target large parasites."},
+  {tag:"wbc", stem:"Selectins mediate which step of extravasation?", options:["Firm adhesion","Rolling","Diapedesis","Chemotaxis"], correct:1, explain:"Selectin-mediated bonds are weak and transient, producing rolling along the endothelium."},
+  {tag:"wbc", stem:"Integrins mediate which step of extravasation?", options:["Rolling","Firm adhesion (arrest)","Margination only","None of the above"], correct:1, explain:"High-affinity integrins (LFA-1, VLA-4) bind endothelial ICAM-1/VCAM-1 to produce firm arrest."},
+  {tag:"wbc", stem:"PECAM-1/CD31 is most closely associated with:", options:["Rolling","Diapedesis (transmigration)","Chemotaxis","Margination"], correct:1, explain:"PECAM-1 interactions at endothelial junctions help the leukocyte squeeze through into the tissue."},
+  {tag:"mono", stem:"In tissue, a monocyte typically differentiates into a:", options:["Neutrophil","Macrophage (or monocyte-derived dendritic cell)","Lymphocyte","Erythrocyte"], correct:1, explain:"Once in tissue, monocytes differentiate into macrophages or, in some contexts, dendritic cells."},
+  {tag:"mono", stem:"Which is NOT a typical macrophage function?", options:["Phagocytosis of debris","Cytokine production","Antibody secretion","Antigen presentation"], correct:2, explain:"Antibody secretion is a function of plasma cells (differentiated B lymphocytes), not macrophages."},
+  {tag:"mono", stem:"Which cytokines are classically produced by activated monocytes/macrophages?", options:["TNF-α, IL-1, IL-6","Insulin, glucagon","Erythropoietin, thrombopoietin","Only IgG"], correct:0, explain:"TNF-α, IL-1, and IL-6 are hallmark pro-inflammatory cytokines released by activated monocytes/macrophages."},
+  {tag:"apc", stem:"MHC class I molecules primarily present antigen to:", options:["CD4+ T cells","CD8+ T cells","B cells","NK cells"], correct:1, explain:"MHC I presents endogenous peptides to CD8+ cytotoxic T cells."},
+  {tag:"apc", stem:"MHC class II molecules primarily present antigen to:", options:["CD8+ T cells","CD4+ T cells","Neutrophils","Erythrocytes"], correct:1, explain:"MHC II presents exogenous/phagocytosed peptides to CD4+ helper T cells."},
+  {tag:"apc", stem:"An extracellular bacterium phagocytosed by a macrophage is processed and presented via:", options:["MHC I only","MHC II","Neither pathway","Direct membrane fusion, no MHC"], correct:1, explain:"Phagocytosed extracellular material follows the exogenous route to MHC II."},
+  {tag:"apc", stem:"A viral protein made in the cytoplasm of an infected cell is presented via:", options:["MHC I (endogenous/proteasome/TAP route)","MHC II only","Neither pathway","Only by dendritic cells"], correct:0, explain:"Cytosolic proteins are degraded by the proteasome, transported via TAP, and loaded onto MHC I."},
+  {tag:"apc", stem:"Cross-presentation refers to:", options:["B cells presenting to T cells","Dendritic cells presenting exogenous antigen via MHC I to CD8+ T cells","MHC I presenting only self-peptides","Macrophages ignoring phagocytosed antigen"], correct:1, explain:"Cross-presentation is the specialized dendritic-cell capability of routing exogenous antigen onto MHC I."},
+  {tag:"apc", stem:"Which cells express MHC class I?", options:["Only professional APCs","Only B cells","Virtually all nucleated cells","Only red blood cells"], correct:2, explain:"MHC I is expressed on nearly all nucleated cells, unlike MHC II which is restricted mainly to professional APCs."}
+];
+/* === DATA_END === */
+
+/* === HELPERS_START === */
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function chip(text, cls){ return '<span class="chip '+(cls||'')+'">'+text+'</span>'; }
+function pbar(pct, color){ return '<div class="pbar"><div class="pbar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'; }
+
+function skeletonSVG(idPrefix){
+  idPrefix = idPrefix || 's';
+  const p = idPrefix;
+  return '<svg viewBox="0 0 240 420" width="240" height="420" xmlns="http://www.w3.org/2000/svg">'
+  + '<g stroke="#0a0d12" stroke-width="2">'
+  + '<ellipse id="'+p+'_skull" cx="120" cy="28" rx="24" ry="27"/>'
+  + '<rect id="'+p+'_chest" x="92" y="70" width="56" height="72" rx="14"/>'
+  + '<rect id="'+p+'_spine" x="112" y="66" width="16" height="150" rx="7"/>'
+  + '<rect id="'+p+'_pelvis" x="88" y="216" width="64" height="38" rx="12"/>'
+  + '<rect id="'+p+'_humProxL" x="52" y="88" width="17" height="32" rx="6"/>'
+  + '<rect id="'+p+'_humProxR" x="171" y="88" width="17" height="32" rx="6"/>'
+  + '<rect id="'+p+'_humDiaL" x="53" y="120" width="14" height="58" rx="6"/>'
+  + '<rect id="'+p+'_humDiaR" x="173" y="120" width="14" height="58" rx="6"/>'
+  + '<circle id="'+p+'_handL" cx="60" cy="192" r="11"/>'
+  + '<circle id="'+p+'_handR" cx="180" cy="192" r="11"/>'
+  + '<rect id="'+p+'_femProxL" x="94" y="256" width="20" height="36" rx="7"/>'
+  + '<rect id="'+p+'_femProxR" x="126" y="256" width="20" height="36" rx="7"/>'
+  + '<rect id="'+p+'_femDiaL" x="96" y="292" width="16" height="86" rx="7"/>'
+  + '<rect id="'+p+'_femDiaR" x="128" y="292" width="16" height="86" rx="7"/>'
+  + '<ellipse id="'+p+'_footL" cx="104" cy="390" rx="15" ry="9"/>'
+  + '<ellipse id="'+p+'_footR" cx="136" cy="390" rx="15" ry="9"/>'
+  + '</g></svg>';
+}
+function applySkeletonColors(root, idPrefix, regions){
+  const map = {chest:'chest', skull:'skull', spine:'spine', pelvis:'pelvis',
+    humProxL:'humProxL',humProxR:'humProxR',humDiaL:'humDiaL',humDiaR:'humDiaR',
+    femProxL:'femProxL',femProxR:'femProxR',femDiaL:'femDiaL',femDiaR:'femDiaR',
+    handL:'handL',handR:'handR',footL:'footL',footR:'footR'};
+  Object.keys(map).forEach(k=>{
+    const elx = root.querySelector('#'+idPrefix+'_'+map[k]);
+    if(elx) elx.setAttribute('fill', REGION_COLOR[regions[k]] || 'var(--bg-3)');
+  });
+}
+
+function longBoneSVG(colors){
+  colors = colors || {};
+  const epi = colors.epi || 'var(--marrow-red)';
+  const meta = colors.meta || 'var(--marrow-red)';
+  const dia = colors.dia || 'var(--marrow)';
+  return '<svg viewBox="0 0 160 320" width="160" height="320" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">'
+  + '<g stroke="#0a0d12" stroke-width="2">'
+  + '<ellipse cx="80" cy="26" rx="34" ry="22" fill="'+epi+'"/>'
+  + '<path d="M50 42 L110 42 L96 78 L64 78 Z" fill="'+meta+'"/>'
+  + '<rect x="60" y="78" width="40" height="160" fill="'+dia+'"/>'
+  + '<path d="M64 238 L96 238 L110 274 L50 274 Z" fill="'+meta+'"/>'
+  + '<ellipse cx="80" cy="292" rx="34" ry="22" fill="'+epi+'"/>'
+  + '</g></svg>';
+}
+
+function eryCellSVG(stage){
+  const d = stage.size, nd = stage.nucleus, cyto = stage.cyto;
+  const cx=90, cy=90;
+  let nucleusSVG = '';
+  if(nd>0){
+    let nucFill = '#2a3341';
+    if(stage.chroma==='fine') nucFill='#3b4a63';
+    if(stage.chroma==='coarser') nucFill='#2f3d54';
+    if(stage.chroma==='clumped') nucFill='#242f42';
+    if(stage.chroma==='pyknotic') nucFill='#12181f';
+    nucleusSVG = '<circle cx="'+cx+'" cy="'+cy+'" r="'+nd+'" fill="'+nucFill+'" stroke="#0a0d12" stroke-width="2"/>';
+  } else if(stage.id==='retic'){
+    nucleusSVG = '<g opacity="0.5">'+Array.from({length:8}).map((_,i)=>{
+      const a = i/8*Math.PI*2, x1=cx+Math.cos(a)*6, y1=cy+Math.sin(a)*6, x2=cx+Math.cos(a)*(d*0.5), y2=cy+Math.sin(a)*(d*0.5);
+      return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#0a0d12" stroke-width="1"/>';
+    }).join('')+'</g>';
+  }
+  const dip = nd>0 ? Math.max(6, d*0.18) : d*0.28;
+  return '<svg viewBox="0 0 180 180" width="200" height="200">'
+    + '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+d+'" ry="'+d+'" fill="'+cyto+'" stroke="#0a0d12" stroke-width="2"/>'
+    + (nd===0 && stage.id==='mature' ? '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+dip+'" ry="'+dip+'" fill="'+cyto+'" opacity="0.55"/>' : '')
+    + nucleusSVG
+    + '</svg>';
+}
+
+function mountStepper(container, stages, renderFn, opts){
+  opts = opts || {};
+  const dur = opts.interval || 2200;
+  let idx = 0, playing = false, timer = null;
+  const dotsHTML = stages.map((s,i)=>'<div class="dot" data-i="'+i+'"></div>').join('');
+  container.innerHTML =
+    '<div class="stepper-shell">'
+    + '<div class="cell-canvas" id="stCanvas"></div>'
+    + '<div class="stage-caption" id="stCaption"></div>'
+    + '<div class="stage-dots">'+dotsHTML+'</div>'
+    + '<div class="stepper-controls">'
+    +   '<button class="btn sm" id="stBack">&larr; BACK</button>'
+    +   '<button class="btn sm primary" id="stPlay">&#9654; PLAY</button>'
+    +   '<button class="btn sm" id="stNext">NEXT &rarr;</button>'
+    +   '<button class="btn sm ghost" id="stReset">RESET</button>'
+    + '</div></div>';
+  const dots = container.querySelectorAll('.dot');
+  const playBtn = container.querySelector('#stPlay');
+  const backBtn = container.querySelector('#stBack');
+  const nextBtn = container.querySelector('#stNext');
+  function stop(){ playing=false; clearInterval(timer); timer=null; playBtn.innerHTML='&#9654; PLAY'; }
+  function show(i){
+    if(!container.isConnected){ stop(); return; }
+    idx = Math.max(0, Math.min(stages.length-1, i));
+    renderFn(stages[idx], idx, stages.length);
+    dots.forEach((d,di)=>{ d.classList.toggle('active', di===idx); d.classList.toggle('done', di<idx); });
+    backBtn.disabled = idx===0;
+    nextBtn.disabled = idx===stages.length-1;
+    if(idx===stages.length-1) stop();
+  }
+  function play(){
+    if(idx>=stages.length-1) idx=-1;
+    playing = true; playBtn.innerHTML = '&#10074;&#10074; PAUSE';
+    timer = setInterval(()=>{
+      if(!container.isConnected){ stop(); return; }
+      if(idx < stages.length-1) show(idx+1); else stop();
+    }, dur);
+    show(idx+1);
+  }
+  playBtn.onclick = ()=>{ playing ? stop() : play(); };
+  backBtn.onclick = ()=>{ stop(); show(idx-1); };
+  nextBtn.onclick = ()=>{ stop(); show(idx+1); };
+  container.querySelector('#stReset').onclick = ()=>{ stop(); show(0); };
+  dots.forEach(d=>d.onclick=()=>{ stop(); show(+d.dataset.i); });
+  show(0);
+}
+
+function o2sat(po2, p50){
+  const n = 2.7;
+  return 100 * Math.pow(po2,n) / (Math.pow(p50,n) + Math.pow(po2,n));
+}
+function drawO2Curve(svgEl, po2Marker, p50, baseP50){
+  const W=300,H=210, x0=36,x1=286, y0=176,y1=18;
+  const toX = po2 => x0 + (po2/100)*(x1-x0);
+  const toY = sat => y0 + (sat/100)*(y1-y0);
+  let path = '';
+  for(let po2=0; po2<=100; po2+=2){
+    const sat = o2sat(po2, p50);
+    path += (po2===0?'M':'L') + toX(po2).toFixed(1)+' '+toY(sat).toFixed(1)+' ';
+  }
+  let basePath = '';
+  for(let po2=0; po2<=100; po2+=4){
+    const sat = o2sat(po2, baseP50);
+    basePath += (po2===0?'M':'L') + toX(po2).toFixed(1)+' '+toY(sat).toFixed(1)+' ';
+  }
+  const markerSat = o2sat(po2Marker, p50);
+  svgEl.innerHTML =
+    '<line x1="'+x0+'" y1="'+y0+'" x2="'+x1+'" y2="'+y0+'" stroke="var(--border)" stroke-width="1"/>'
+  + '<line x1="'+x0+'" y1="'+y0+'" x2="'+x0+'" y2="'+y1+'" stroke="var(--border)" stroke-width="1"/>'
+  + '<text x="'+((x0+x1)/2)+'" y="204" fill="var(--text-faint)" font-size="10" font-family="var(--font-mono)" text-anchor="middle">PO2 (mmHg)</text>'
+  + '<text x="14" y="'+((y0+y1)/2)+'" fill="var(--text-faint)" font-size="10" font-family="var(--font-mono)" text-anchor="middle" transform="rotate(-90 14 '+((y0+y1)/2)+')">SaO2 (%)</text>'
+  + '<path d="'+basePath+'" fill="none" stroke="var(--text-faint)" stroke-width="1.5" stroke-dasharray="4 3"/>'
+  + '<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/>'
+  + '<line x1="'+toX(po2Marker)+'" y1="'+y0+'" x2="'+toX(po2Marker)+'" y2="'+toY(markerSat)+'" stroke="var(--marrow-red)" stroke-width="1" stroke-dasharray="3 3"/>'
+  + '<circle cx="'+toX(po2Marker)+'" cy="'+toY(markerSat)+'" r="5" fill="var(--marrow-red)" stroke="#04121a" stroke-width="1.5"/>';
+  return markerSat;
+}
+
+let quizState = { queue:[], missed:{}, mode:'practice', examIdx:0, examSet:[], examAnswers:[] };
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function renderMCQ(container, q, onDone){
+  container.innerHTML =
+    '<div class="quiz-stem">'+esc(q.stem)+'</div>'
+  + '<div id="mcqOpts">'+q.options.map((o,i)=>'<button class="option" data-i="'+i+'">'+esc(o)+'</button>').join('')+'</div>'
+  + '<div class="explain" id="mcqExplain">'+esc(q.explain)+'</div>'
+  + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="mcqNext" style="display:none;">CONTINUE &rarr;</button></div>';
+  const opts = container.querySelectorAll('.option');
+  let answered=false;
+  opts.forEach(btn=>{
+    btn.onclick = ()=>{
+      if(answered) return; answered=true;
+      const i = +btn.dataset.i;
+      opts.forEach(b=>b.disabled=true);
+      btn.classList.add(i===q.correct?'correct':'wrong');
+      if(i!==q.correct) opts[q.correct].classList.add('correct');
+      container.querySelector('#mcqExplain').classList.add('open');
+      container.querySelector('#mcqNext').style.display='inline-flex';
+      onDone(i===q.correct);
+    };
+  });
+  container.querySelector('#mcqNext').onclick = ()=> onDone.next && onDone.next();
+}
+/* === HELPERS_END === */
+
+/* === VIEWS_START === */
+function moduleHeader(kicker, title){ return '<div class="module-header"><div class="kicker">'+kicker+'</div><h1>'+title+'</h1></div>'; }
+function tabsBar(tabs, active){ return '<div class="tabs">'+tabs.map(t=>'<button class="tab '+(t.id===active?'active':'')+'" data-tab="'+t.id+'">'+t.label+'</button>').join('')+'</div>'; }
+function wireTabs(root, onChange){ root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>onChange(b.dataset.tab)); }
+
+const ICONS = {
+  mri:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>',
+  hemato:'<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5" fill="currentColor"/><path d="M12 7 V13 M12 13 L6 19 M12 13 L18 19" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="6" cy="20" r="2" fill="currentColor"/><circle cx="18" cy="20" r="2" fill="currentColor"/></svg>',
+  eryth:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="9" fill="currentColor"/><ellipse cx="12" cy="12" rx="3.2" ry="3.2" fill="var(--bg-1)" opacity=".6"/></svg>',
+  rbc:'<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="15" cy="14" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  wbc:'<svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="4.5" fill="currentColor"/><circle cx="15" cy="9" r="4.5" fill="currentColor"/><circle cx="12" cy="15" r="4.5" fill="currentColor"/></svg>',
+  mono:'<svg viewBox="0 0 24 24"><path d="M4 14c0-6 4-9 9-9 5 0 7 4 6 8s-5 6-9 6-6-2-6-5z" fill="currentColor"/></svg>',
+  apc:'<svg viewBox="0 0 24 24"><path d="M6 4 v16 M6 4 L17 8 L6 12" fill="currentColor" stroke="currentColor" stroke-width="1.5"/></svg>',
+  clinical:'<svg viewBox="0 0 24 24"><path d="M11 4h2v6h6v2h-6v6h-2v-6H5v-2h6z" fill="currentColor"/></svg>',
+  quiz:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 12.5l2.5 2.5L16 9" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
+};
+
+const MOD_LIST = [
+  {id:'mri', num:'01', title:'Bone Marrow MRI', desc:'Red vs yellow marrow, T1/T2/STIR signal, age conversion.', color:'var(--marrow)'},
+  {id:'hemato', num:'02', title:'Hematopoiesis', desc:'Interactive stem cell lineage tree.', color:'var(--accent)'},
+  {id:'eryth', num:'03', title:'Erythropoiesis', desc:'Stage-by-stage maturation and the EPO feedback loop.', color:'var(--marrow-red)'},
+  {id:'rbc', num:'04', title:'Erythrocyte Physiology', desc:'Structure, O2/CO2 transport, acid-base, lifespan.', color:'#e0505a'},
+  {id:'wbc', num:'05', title:'Leukocytes', desc:'Five cell types plus the extravasation simulator.', color:'var(--wbc)'},
+  {id:'mono', num:'06', title:'Monocytes', desc:'Blood to tissue to macrophage, and phagocytosis.', color:'var(--mono-c)'},
+  {id:'apc', num:'07', title:'Antigen-Presenting Cells', desc:'MHC I vs MHC II and innate-to-adaptive immunity.', color:'var(--immune)'},
+  {id:'clinical', num:'08', title:'Clinical Connection', desc:'Short reasoning cases across every module.', color:'var(--warn)'},
+  {id:'quiz', num:'09', title:'Test Yourself', desc:'Active recall bank plus a timed exam mode.', color:'var(--good)'}
+];
+
+function renderHome(root){
+  root.innerHTML =
+    '<div class="hero">'
+    + '<div><div class="eyebrow">Hematopoietic Physiology Lab</div>'
+    + '<h1>From bone marrow<br>to blood and immunity</h1>'
+    + '<p class="sub">An interactive simulator for exploring where blood cells come from, how they work, how they are regulated, and how they connect to immunity &mdash; grounded in bone marrow MRI physiology and core hematology/immunology teaching.</p>'
+    + '<div class="btn-row"><button class="btn primary" onclick="navigate(\'mri\')">ENTER THE LAB &rarr;</button><button class="btn ghost" onclick="navigate(\'quiz\')">TEST YOURSELF</button></div></div>'
+    + '<div class="skeleton-wrap">'+(()=>{ const s=skeletonSVG('home'); return s; })()+'</div>'
+    + '</div>'
+    + '<div class="module-grid">'
+    + MOD_LIST.map(m=>'<button class="mod-card" style="--accent-c:'+m.color+'" onclick="navigate(\''+m.id+'\')"><div class="num">MODULE '+m.num+'</div><div class="icon">'+ICONS[m.id]+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p></button>').join('')
+    + '</div>';
+  const svg = root.querySelector('.skeleton-wrap svg');
+  applySkeletonColors(svg, 'home', AGE_STAGES[5].regions);
+}
+
+function mriDisclaimer(){
+  return '<div class="disclaimer"><b>&#9888;</b><div><b>Educational simulation:</b> MRI demonstrates bone marrow composition and distribution, not individual hematopoietic cells (no BFU-E, CFU-E, erythroblasts, reticulocytes, or individual leukocytes are ever visible on MRI).</div></div>';
+}
+
+function renderMRI(root){
+  let tab = 'comp', seq = 'T1', isolate = null, compareOpen = false, ageIdx = 5;
+  function paint(){
+    root.innerHTML = moduleHeader('Module 01 &middot; Radiology', 'Bone Marrow MRI')
+      + mriDisclaimer()
+      + tabsBar([{id:'comp',label:'COMPOSITION'},{id:'seq',label:'T1 / T2 / STIR'},{id:'age',label:'AGE CONVERSION'},{id:'zoom',label:'ZOOM TO MARROW'}], tab)
+      + '<div id="mriBody"></div>';
+    wireTabs(root, t=>{ tab=t; paint(); });
+    paintBody();
+  }
+  function paintBody(){
+    const body = root.querySelector('#mriBody');
+    if(tab==='comp') return paintComp(body);
+    if(tab==='seq') return paintSeq(body);
+    if(tab==='age') return paintAge(body);
+    if(tab==='zoom') return paintZoom(body);
+  }
+  function paintComp(body){
+    const r=MARROW_COMPOSITION.red, y=MARROW_COMPOSITION.yellow;
+    function box(m){
+      return '<div class="compare-box"><h4><span class="swatch" style="background:'+m.color+'"></span>'+m.name+'</h4>'
+      + '<div class="stat-row"><span>Hematopoietic cells</span><span>'+m.cellPct+'%</span></div>'+pbar(m.cellPct, m.color)
+      + '<div class="stat-row" style="margin-top:10px;"><span>Adipocytes</span><span>'+m.fatCellPct+'%</span></div>'+pbar(m.fatCellPct, 'var(--text-faint)')
+      + '<div style="margin-top:16px;"><table class="comp-table"><tr><th>Chemical composition</th><th></th></tr>'
+      + '<tr><td>Fat</td><td>'+m.chem.fat+'%</td></tr><tr><td>Water</td><td>'+m.chem.water+'%</td></tr><tr><td>Protein</td><td>'+m.chem.protein+'%</td></tr></table></div>'
+      + '<p style="margin-top:12px;">'+m.function+'</p></div>';
+    }
+    body.innerHTML = '<div class="grid-2">'+box(r)+box(y)+'</div>'
+      + '<div style="margin-top:14px;">'+chip('Source: '+SRC_MRI,'source')+'</div>';
+  }
+  function paintSeq(body){
+    const S = MRI_SEQUENCES[seq];
+    const epiMetaColor = isolate==='yellow' ? 'rgba(93,110,130,.25)' : S.red.gray;
+    const diaColor = isolate==='red' ? 'rgba(93,110,130,.25)' : S.yellow.gray;
+    if(compareOpen){
+      body.innerHTML = '<div class="panel"><div class="select-grid">'+['T1','T2','STIR'].map(k=>'<span class="pill" style="background:'+(k===seq?'var(--accent)':'')+'">'+k+'</span>').join('')+'</div>'
+      + '<div class="grid-3">'+['T1','T2','STIR'].map(k=>{
+          const Sk = MRI_SEQUENCES[k];
+          return '<div class="compare-box"><h4>'+Sk.label+'</h4><div style="max-width:140px;margin:0 auto;">'+longBoneSVG({epi:Sk.red.gray, meta:Sk.red.gray, dia:Sk.yellow.gray})+'</div>'
+          + '<p style="font-size:11.5px;">Yellow: '+Sk.yellow.desc+'</p><p style="font-size:11.5px;">Red: '+Sk.red.desc+'</p></div>';
+        }).join('')+'</div>'
+      + '<div class="btn-row" style="margin-top:16px;"><button class="btn" id="seqBackBtn">&larr; BACK TO SINGLE VIEW</button></div></div>';
+      body.querySelector('#seqBackBtn').onclick=()=>{ compareOpen=false; paintSeq(body); };
+      return;
+    }
+    body.innerHTML =
+      '<div class="panel">'
+      + '<div class="select-grid">'+Object.keys(MRI_SEQUENCES).map(k=>'<button class="pill'+(k===seq?' active':'')+'" data-seq="'+k+'" style="'+(k===seq?'background:var(--accent);border-color:var(--accent);':'')+'">'+k+'</button>').join('')+'</div>'
+      + '<div class="grid-2">'
+      +   '<div style="max-width:220px;margin:0 auto;">'+longBoneSVG({epi:epiMetaColor, meta:epiMetaColor, dia:diaColor})+'</div>'
+      +   '<div><h3>'+S.label+'</h3>'
+      +     '<p><span class="swatch" style="background:var(--marrow)"></span> <b>Yellow marrow zone (diaphysis):</b> '+S.yellow.desc+'</p>'
+      +     '<p><span class="swatch" style="background:var(--marrow-red)"></span> <b>Red marrow zone (metaphysis/epiphysis):</b> '+S.red.desc+'</p>'
+      +     '<div class="btn-row">'
+      +       '<button class="btn sm" id="whyBtn">WHY?</button>'
+      +       '<button class="btn sm" id="cmpBtn">COMPARE ALL</button>'
+      +       '<button class="btn sm" id="showRedBtn">SHOW RED MARROW</button>'
+      +       '<button class="btn sm" id="showYellowBtn">SHOW YELLOW MARROW</button>'
+      +     '</div>'
+      +     '<div class="why-box" id="whyBox">'+S.why+'</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="side-note">Simulated signal schematic, not a real patient image. '+chip('Source: '+SRC_MRI,'source')+'</div>'
+      + '</div>';
+    body.querySelectorAll('[data-seq]').forEach(b=>b.onclick=()=>{ seq=b.dataset.seq; paintSeq(body); });
+    body.querySelector('#whyBtn').onclick=()=>body.querySelector('#whyBox').classList.toggle('open');
+    body.querySelector('#cmpBtn').onclick=()=>{ compareOpen=true; paintSeq(body); };
+    body.querySelector('#showRedBtn').onclick=()=>{ isolate = isolate==='red'?null:'red'; paintSeq(body); };
+    body.querySelector('#showYellowBtn').onclick=()=>{ isolate = isolate==='yellow'?null:'yellow'; paintSeq(body); };
+  }
+  function paintAge(body){
+    const st = AGE_STAGES[ageIdx];
+    body.innerHTML =
+      '<div class="panel">'
+      + '<div class="slider-block"><label><span>AGE</span><span>'+st.label+'</span></label>'
+      + '<input type="range" id="ageSlider" min="0" max="'+(AGE_STAGES.length-1)+'" step="1" value="'+ageIdx+'">'
+      + '<div class="age-ticks">'+AGE_STAGES.map(s=>'<span>'+s.label+'</span>').join('')+'</div></div>'
+      + '<div class="grid-2">'
+      +   '<div class="skeleton-wrap">'+skeletonSVG('age')+'</div>'
+      +   '<div><div style="max-width:160px;margin:0 auto 14px;">'+longBoneSVG({epi:REGION_COLOR[st.regions.femProxL], meta:REGION_COLOR[st.regions.femProxL], dia:REGION_COLOR[st.regions.femDiaL]})+'</div>'
+      +     '<p>'+st.text+'</p>'
+      +     '<div class="btn-row">'+['red','redyellow','yellow','cartilage'].map(k=>'<span class="chip"><span class="swatch" style="background:'+REGION_COLOR[k]+'"></span> '+({red:'Red marrow',redyellow:'Converting',yellow:'Yellow marrow',cartilage:'Cartilage (unossified)'}[k])+'</span>').join('')+'</div>'
+      +   '</div>'
+      + '</div>'
+      + '<p class="side-note">Marrow conversion is faster in girls than boys; individual studies vary, so interpretation is always done case by case. Simplified didactic schematic based on Londoño et al., 2015. '+chip('Source: '+SRC_MRI,'source')+'</p>'
+      + '</div>';
+    applySkeletonColors(body.querySelector('.skeleton-wrap svg'), 'age', st.regions);
+    body.querySelector('#ageSlider').oninput = (e)=>{ ageIdx = +e.target.value; paintAge(body); };
+  }
+  function paintZoom(body){
+    const ZOOM_STAGES = [
+      {name:'MRI Slice', size:70, color:'#3a3a3a', desc:'A T1-weighted image of the vertebral body region you selected.'},
+      {name:'Cortical Bone', size:100, color:'#cbb98a', desc:'The dense outer shell of the bone.'},
+      {name:'Spongy (Trabecular) Bone', size:130, color:'#b79e6b', desc:'Porous inner bone providing structural support.'},
+      {name:'Trabeculae', size:160, color:'#a98c55', desc:'Bony struts that scaffold the marrow space.'},
+      {name:'Red Marrow', size:190, color:'#e0505a', desc:'The hematopoietic tissue filling the space between trabeculae.'},
+      {name:'Hematopoietic Niche', size:210, color:'#c94550', desc:'A microenvironment of stromal and endothelial cells that supports stem cells.'},
+      {name:'Hematopoietic Stem Cell', size:60, color:'#35c7ff', desc:'The pluripotent origin of every blood lineage. The radiology module ends here; cellular physiology begins next.'}
+    ];
+    body.innerHTML = '<div class="panel"><h3 style="text-align:center;">ZOOM INTO ACTIVE MARROW</h3><div id="zoomStepper"></div><div class="btn-row" id="zoomContinueRow" style="justify-content:center;display:none;"><button class="btn primary" onclick="navigate(\'hemato\')">CONTINUE TO HEMATOPOIESIS &rarr;</button></div></div>';
+    mountStepper(body.querySelector('#zoomStepper'), ZOOM_STAGES, (s,i,n)=>{
+      body.querySelector('#stCanvas').innerHTML = '<div style="width:'+s.size+'px;height:'+s.size+'px;border-radius:50%;background:'+s.color+';transition:all .5s ease;box-shadow:0 0 30px '+s.color+'55;"></div>';
+      body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+      body.querySelector('#zoomContinueRow').style.display = i===n-1 ? 'flex' : 'none';
+    });
+  }
+  paint();
+}
+function findNode(id, node){ node = node || HEMATO_TREE; if(node.id===id) return node; if(node.children){ for(const c of node.children){ const f=findNode(id,c); if(f) return f; } } return null; }
+function infoPanelHTML(node){
+  const sections=['origin','function','location','characteristics','fate'];
+  const labels={origin:'Origin',function:'Function',location:'Location',characteristics:'Characteristics',fate:'Fate'};
+  return '<div class="panel"><h3>'+node.name+'</h3>'
+    + sections.map(k=>'<details style="margin-bottom:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--bg-2);"><summary style="cursor:pointer;font-weight:600;font-size:13px;">'+labels[k]+'</summary><p style="margin-top:8px;">'+node.info[k]+'</p></details>').join('')
+    + '</div>';
+}
+function renderHemato(root){
+  let selected = null;
+  function paint(){
+    root.innerHTML = moduleHeader('Module 02 &middot; Hematopoiesis','Hematopoietic Stem Cell Lineage Tree')
+      + '<p style="color:var(--text-dim);max-width:70ch;">Click any cell to reveal its origin, function, location, characteristics, and fate &mdash; one section at a time.</p>'
+      + '<div class="panel" style="margin-bottom:16px;">'
+      + '<div style="display:flex;justify-content:center;margin-bottom:6px;"><button class="btn primary tree-node" data-id="hsc">'+HEMATO_TREE.name+'</button></div>'
+      + '<div style="text-align:center;color:var(--text-faint);font-size:20px;margin:2px 0 14px;">&darr;</div>'
+      + '<div class="grid-2">'
+      + HEMATO_TREE.children.map(branch=>
+          '<div style="text-align:center;"><button class="btn tree-node" data-id="'+branch.id+'" style="width:100%;border-color:'+(branch.branch==='myeloid'?'var(--marrow-red)':'var(--immune)')+';">'+branch.name+'</button>'
+          + '<div class="btn-row" style="margin-top:12px;justify-content:center;">'+branch.children.map(c=>'<button class="btn sm tree-node" data-id="'+c.id+'" style="border-color:'+(branch.branch==='myeloid'?'var(--marrow-red)':'var(--immune)')+';">'+c.name+'</button>').join('')+'</div></div>'
+        ).join('')
+      + '</div></div>'
+      + '<div id="hematoInfo"></div>';
+    root.querySelectorAll('.tree-node').forEach(b=>b.onclick=()=>{ selected=b.dataset.id; paintInfo(); mark(); });
+    mark();
+    if(selected) paintInfo();
+  }
+  function mark(){ root.querySelectorAll('.tree-node').forEach(b=>{ b.style.boxShadow = b.dataset.id===selected ? '0 0 0 2px var(--accent)' : 'none'; }); }
+  function paintInfo(){ const node = findNode(selected); root.querySelector('#hematoInfo').innerHTML = node ? infoPanelHTML(node) : ''; }
+  paint();
+}
+
+function flowNode(label,hot){ return '<div class="flow-node'+(hot?' hot':'')+'">'+label+'</div>'; }
+function flowArrow(){ return '<div class="flow-arrow">&rarr;</div>'; }
+function pillToggle(id,label){ return '<button class="pill" data-flag="'+id+'" data-state="normal">'+label+': NORMAL</button>'; }
+
+function renderEryth(root){
+  root.innerHTML = moduleHeader('Module 03 &middot; Erythropoiesis','From Stem Cell to Erythrocyte')
+    + '<div class="panel"><div class="grid-2"><div id="eryStepperMount"></div><div><div id="eryReadouts"></div></div></div></div>'
+    + '<div class="panel" style="margin-top:16px;">'
+    +   '<h3>EPO Feedback Simulator</h3>'
+    +   '<p class="side-note" style="margin-top:-6px;">Educational model &mdash; not a therapeutic dosing simulator.</p>'
+    +   '<div class="grid-2">'
+    +     '<div>'
+    +       '<div class="slider-block"><label><span>TISSUE O2</span><span id="o2Val">95%</span></label><input type="range" id="o2Slider" min="50" max="100" value="95"></div>'
+    +       '<div class="slider-block"><label><span>RENAL FUNCTION</span><span id="renalVal">100%</span></label><input type="range" id="renalSlider" min="10" max="100" value="100"></div>'
+    +       '<div class="select-grid">'+pillToggle('iron','IRON')+pillToggle('b12','VITAMIN B12')+pillToggle('folate','FOLATE')+'</div>'
+    +     '</div>'
+    +     '<div><div id="epoFlow"></div><div id="epoNotes" style="font-size:12.5px;color:var(--text-dim);margin-top:8px;"></div></div>'
+    +   '</div>'
+    + '</div>';
+
+  mountStepper(root.querySelector('#eryStepperMount'), ERY_STAGES, (s,i,n)=>{
+    root.querySelector('#stCanvas').innerHTML = eryCellSVG(s);
+    root.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'/'+n+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+    root.querySelector('#eryReadouts').innerHTML =
+      '<div class="stat-row"><span>Relative cell size</span></div>'+pbar(Math.round(s.size/70*100),'var(--accent)')
+    + '<div class="stat-row" style="margin-top:12px;"><span>Nuclear condensation</span><span>'+(s.nucleus>0?Math.round((70-s.nucleus)/70*100)+'%':'Enucleated')+'</span></div>'+pbar(s.nucleus>0?Math.round((70-s.nucleus)/70*100):100,'var(--immune)')
+    + '<div class="stat-row" style="margin-top:12px;"><span>Hemoglobin content</span><span>'+s.hb+'%</span></div>'+pbar(s.hb,'var(--marrow-red)');
+  });
+
+  const o2Slider=root.querySelector('#o2Slider'), renalSlider=root.querySelector('#renalSlider');
+  const flags={iron:'normal', b12:'normal', folate:'normal'};
+  function recompute(){
+    root.querySelector('#o2Val').textContent = o2Slider.value+'%';
+    root.querySelector('#renalVal').textContent = renalSlider.value+'%';
+    const o2=+o2Slider.value, renal=+renalSlider.value;
+    const hypoxicDrive = (100-o2);
+    const epoLevel = Math.max(5, Math.round((20 + hypoxicDrive*2.4) * (renal/100)));
+    const hot = epoLevel > 45;
+    root.querySelector('#epoFlow').innerHTML = '<div class="flow-diagram">'
+      + flowNode('Kidney', renal<60) + flowArrow()
+      + flowNode('EPO &asymp; '+epoLevel, hot) + flowArrow()
+      + flowNode('Erythroid stimulus', hot) + flowArrow()
+      + flowNode('Reticulocytes', hot) + flowArrow()
+      + flowNode('Erythrocytes', hot)
+      + '</div>';
+    let notes=[];
+    if(renal<60) notes.push('Reduced renal function limits EPO synthesis capacity, blunting the response even under hypoxia (anemia of chronic kidney disease).');
+    if(flags.iron==='low') notes.push('Iron deficiency limits hemoglobin synthesis despite an adequate erythroid stimulus.');
+    if(flags.b12==='low' || flags.folate==='low') notes.push('B12/folate deficiency impairs DNA synthesis during maturation, producing large, immature-appearing precursors (megaloblastic pattern).');
+    if(o2<75) notes.push('Tissue hypoxia is driving increased EPO synthesis via the renal HIF pathway.');
+    root.querySelector('#epoNotes').innerHTML = notes.map(n=>'<p>&bull; '+n+'</p>').join('') || '<p>Baseline state &mdash; no significant stimulus detected.</p>';
+  }
+  o2Slider.oninput = recompute; renalSlider.oninput = recompute;
+  root.querySelectorAll('[data-flag]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id=btn.dataset.flag; flags[id] = flags[id]==='normal'?'low':'normal';
+      btn.dataset.state = flags[id]; btn.textContent = btn.textContent.split(':')[0]+': '+flags[id].toUpperCase();
+      btn.classList.toggle('active', flags[id]==='low');
+      if(flags[id]==='low'){ btn.style.background='var(--warn)'; btn.style.color='#04121a'; btn.style.borderColor='var(--warn)'; }
+      else { btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }
+      recompute();
+    };
+  });
+  recompute();
+}
+function paintStructure(body){
+  body.innerHTML = '<div class="panel"><div class="grid-2">'
+    + '<div style="text-align:center;"><svg viewBox="0 0 200 140" width="200" height="140" style="max-width:280px;width:100%;height:auto;display:block;margin:0 auto;"><g id="rbcShapeGroup" style="transform-box:fill-box;transform-origin:center;transition:transform .8s ease;"><ellipse cx="100" cy="70" rx="85" ry="42" fill="#c9414c" stroke="#0a0d12" stroke-width="2"/><ellipse cx="100" cy="70" rx="55" ry="20" fill="#e0505a" opacity="0.65"/></g></svg>'
+    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="squeezeBtn">SIMULATE CAPILLARY PASSAGE</button></div></div>'
+    + '<div><ul style="padding-left:18px;color:var(--text-dim);font-size:13.5px;line-height:1.85;margin:0;">'
+    +   '<li><b style="color:var(--text)">Biconcave disc</b> &mdash; increases surface area for gas exchange.</li>'
+    +   '<li><b style="color:var(--text)">No nucleus, no organelles</b> &mdash; maximizes internal space for hemoglobin.</li>'
+    +   '<li><b style="color:var(--text)">Spectrin cytoskeleton</b> &mdash; gives the flexible membrane its deformability.</li>'
+    +   '<li><b style="color:var(--text)">Deformability</b> &mdash; lets the ~7-8&mu;m cell squeeze through narrower capillaries.</li>'
+    +   '</ul></div></div></div>';
+  body.querySelector('#squeezeBtn').onclick=()=>{
+    const g=body.querySelector('#rbcShapeGroup');
+    g.style.transform='scaleX(1.5) scaleY(0.55)';
+    setTimeout(()=>{ g.style.transform='none'; },1400);
+  };
+}
+function paintOxygenTab(body){
+  body.innerHTML = '<div class="panel"><div class="grid-2">'
+    + '<div><svg id="o2svg" viewBox="0 0 300 210" style="width:100%;max-width:320px;"></svg>'
+    +   '<div id="o2Readout" style="font-family:var(--font-mono);font-size:12.5px;color:var(--text-dim);margin-top:8px;"></div></div>'
+    + '<div>'
+    +   '<div class="slider-block"><label><span>PO2 (mmHg)</span><span id="po2Val">40</span></label><input type="range" id="po2Slider" min="10" max="100" value="40"></div>'
+    +   '<div class="slider-block"><label><span>pH</span><span id="phVal">7.40</span></label><input type="range" id="phSlider" min="710" max="760" value="740"></div>'
+    +   '<div class="slider-block"><label><span>PCO2 (mmHg)</span><span id="co2Val">40</span></label><input type="range" id="co2Slider" min="20" max="80" value="40"></div>'
+    +   '<p class="side-note">Dashed curve = baseline (pH 7.40, PCO2 40). Solid curve = current conditions. Simplified schematic for teaching, not a patient-specific measurement.</p>'
+    + '</div></div></div>'
+    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Lung &rarr; Hemoglobin + O2 &rarr; Tissue</h3><div class="flow-diagram">'
+    + flowNode('Alveolus (high PO2)',false)+flowArrow()+flowNode('Hb + O2 &harr; HbO2',false)+flowArrow()+flowNode('Tissue (low PO2, O2 released)',false)
+    + '</div></div>';
+  const svg=body.querySelector('#o2svg'), po2S=body.querySelector('#po2Slider'), phS=body.querySelector('#phSlider'), co2S=body.querySelector('#co2Slider');
+  function recompute(){
+    const po2=+po2S.value, ph=(+phS.value)/100, co2=+co2S.value;
+    body.querySelector('#po2Val').textContent=po2;
+    body.querySelector('#phVal').textContent=ph.toFixed(2);
+    body.querySelector('#co2Val').textContent=co2;
+    const p50 = 26.8 + (7.4-ph)*30 + (co2-40)*0.15;
+    const sat = drawO2Curve(svg, po2, p50, 26.8);
+    const shift = p50>27.5 ? 'RIGHT (↓ O2 affinity — Bohr effect)' : (p50<26 ? 'LEFT (↑ O2 affinity)' : 'near baseline');
+    body.querySelector('#o2Readout').innerHTML = 'P50 &asymp; '+p50.toFixed(1)+' mmHg &middot; curve shifted '+shift+'<br>At PO2 '+po2+' mmHg &rarr; SaO2 &asymp; '+sat.toFixed(0)+'%';
+  }
+  po2S.oninput=recompute; phS.oninput=recompute; co2S.oninput=recompute; recompute();
+}
+function paintCO2Tab(body){
+  const CO2_STAGES=[
+    {name:'Tissue CO2 production', desc:'Metabolizing tissue produces CO2 as a byproduct of respiration.'},
+    {name:'CO2 enters the erythrocyte', desc:'CO2 diffuses from plasma into the red blood cell.'},
+    {name:'Carbonic anhydrase', desc:'Carbonic anhydrase, abundant inside the erythrocyte, rapidly catalyzes CO2 + H2O → H2CO3.'},
+    {name:'Dissociation', desc:'Carbonic acid dissociates into H+ and HCO3⁻. Hemoglobin buffers most of the H+.'},
+    {name:'Chloride shift', desc:'HCO3⁻ exits into plasma via the band 3 exchanger, swapped for Cl⁻ entering the cell to preserve electroneutrality.'}
+  ];
+  body.innerHTML='<div class="panel"><div id="co2Stepper"></div></div>';
+  mountStepper(body.querySelector('#co2Stepper'), CO2_STAGES, (s,i)=>{
+    body.querySelector('#stCanvas').innerHTML='<div class="flow-diagram">'+CO2_STAGES.map((st,si)=>flowNode(st.name, si===i)+(si<CO2_STAGES.length-1?flowArrow():'')).join('')+'</div>';
+    body.querySelector('#stCaption').innerHTML='<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+  }, {interval:2600});
+}
+function paintLifespan(body){
+  body.innerHTML = '<div class="panel">'
+    + '<div class="slider-block"><label><span>DAYS IN CIRCULATION</span><span id="dayVal">0</span></label><input type="range" id="daySlider" min="0" max="120" value="0"></div>'
+    + '<div id="lifeCanvas" class="cell-canvas"></div>'
+    + '<div id="lifeCaption" style="text-align:center;max-width:520px;margin:0 auto;"></div>'
+    + '<div class="btn-row" style="justify-content:center;"><button class="btn sm" id="jump120">JUMP TO DAY 120</button><button class="btn sm ghost" id="resetLife">RESET</button></div>'
+    + '</div>';
+  const slider=body.querySelector('#daySlider');
+  function paintDay(d){
+    body.querySelector('#dayVal').textContent=d;
+    if(d<120){
+      const t=d/120;
+      const r=Math.round(0xe0-(0xe0-0x8a)*t), g=Math.round(0x50-(0x50-0x4a)*t), b=Math.round(0x5a-(0x5a-0x4a)*t);
+      const col='rgb('+r+','+g+','+b+')';
+      body.querySelector('#lifeCanvas').innerHTML='<svg viewBox="0 0 180 180" width="180" height="180"><ellipse cx="90" cy="90" rx="34" ry="20" fill="'+col+'" stroke="#0a0d12" stroke-width="2"/></svg>';
+      body.querySelector('#lifeCaption').innerHTML = d<100 ? '<p>A mature erythrocyte circulating normally, delivering O2 and CO2.</p>' : '<p>Approaching senescence: membrane deformability declines with age.</p>';
+    } else {
+      body.querySelector('#lifeCanvas').innerHTML='<svg viewBox="0 0 180 180" width="180" height="180"><ellipse cx="90" cy="90" rx="46" ry="34" fill="var(--mono-c)" opacity="0.9"/><ellipse cx="72" cy="90" rx="13" ry="13" fill="#8a4a4a"/></svg>';
+      body.querySelector('#lifeCaption').innerHTML = '<p><b>Day &asymp;120:</b> the senescent erythrocyte is recognized and phagocytosed by macrophages in the spleen and liver. Hemoglobin is broken down: <b>iron</b> is recycled toward the marrow (via transferrin) to support new erythropoiesis, globin is reduced to amino acids, and heme is converted to bilirubin.</p>';
+    }
+  }
+  slider.oninput=(e)=>paintDay(+e.target.value);
+  body.querySelector('#jump120').onclick=()=>{ slider.value=120; paintDay(120); };
+  body.querySelector('#resetLife').onclick=()=>{ slider.value=0; paintDay(0); };
+  paintDay(0);
+}
+function renderRBC(root){
+  let tab='structure';
+  function paint(){
+    root.innerHTML = moduleHeader('Module 04 &middot; Erythrocyte Physiology','Structure, Gas Transport &amp; Lifespan')
+      + tabsBar([{id:'structure',label:'STRUCTURE'},{id:'oxygen',label:'OXYGEN'},{id:'co2',label:'CO2 / ACID-BASE'},{id:'lifespan',label:'LIFESPAN'}], tab)
+      + '<div id="rbcBody"></div>';
+    wireTabs(root, t=>{ tab=t; paint(); });
+    const body=root.querySelector('#rbcBody');
+    if(tab==='structure') paintStructure(body);
+    else if(tab==='oxygen') paintOxygenTab(body);
+    else if(tab==='co2') paintCO2Tab(body);
+    else paintLifespan(body);
+  }
+  paint();
+}
+
+function wbcCellSVG(w){
+  const cx=60,cy=60,r=52;
+  let inner='';
+  if(w.id==='neu'){
+    inner = [[45,45],[75,45],[45,75],[75,75]].map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="12" fill="#e7ecf2"/>').join('');
+  } else if(w.id==='eos'){
+    inner = '<circle cx="48" cy="52" r="14" fill="#e7ecf2"/><circle cx="74" cy="68" r="14" fill="#e7ecf2"/>'
+      + Array.from({length:14}).map((_,i)=>{ const a=(i/14)*6.28, rad=22+((i%3)*8); return '<circle cx="'+(cx+Math.cos(a)*rad).toFixed(1)+'" cy="'+(cy+Math.sin(a)*rad).toFixed(1)+'" r="3" fill="'+w.color+'"/>'; }).join('');
+  } else if(w.id==='bas'){
+    inner = Array.from({length:26}).map((_,i)=>{ const a=(i/26)*6.28*3, rad=(i%40); return '<circle cx="'+(cx+Math.cos(a)*rad).toFixed(1)+'" cy="'+(cy+Math.sin(a)*rad).toFixed(1)+'" r="4" fill="'+w.color+'"/>'; }).join('');
+  } else if(w.id==='lym'){
+    inner = '<circle cx="60" cy="60" r="38" fill="#2a3341"/>';
+  } else if(w.id==='mon'){
+    inner = '<path d="M40 40 C30 55 35 80 55 82 C75 84 82 65 72 50 C64 40 48 32 40 40 Z" fill="#2a3341"/>';
+  }
+  return '<svg viewBox="0 0 120 120" width="150" height="150"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#39424f" stroke="#0a0d12" stroke-width="2"/>'+inner+'</svg>';
+}
+function paintCells(body, getActive, setActive){
+  const active = getActive();
+  body.innerHTML = '<div class="select-grid">'+WBC_TYPES.map(w=>'<button class="pill" data-id="'+w.id+'" style="'+(w.id===active?('background:'+w.color+';border-color:'+w.color+';color:#04121a;'):'')+'"><span class="swatch-dot" style="background:'+w.color+'"></span>'+w.name+'</button>').join('')+'</div><div id="wbcCard"></div>';
+  body.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{ setActive(b.dataset.id); paintCells(body, getActive, setActive); });
+  const w = WBC_TYPES.find(x=>x.id===active);
+  body.querySelector('#wbcCard').innerHTML = '<div class="panel"><div class="grid-2">'
+    + '<div style="text-align:center;">'+wbcCellSVG(w)+'</div>'
+    + '<div><h3 style="color:'+w.color+';">'+w.name+'</h3>'
+    +   '<p><b>Morphology:</b> '+w.morphology+'</p>'
+    +   '<p><b>Function:</b> '+w.func+'</p>'
+    +   '<p><b>Physiological role:</b> '+w.role+'</p>'
+    +   '<p><b>Fate:</b> '+w.fate+'</p>'
+    +   '<p style="color:var(--warn);"><b>Clinical correlation:</b> '+w.clinical+'</p>'
+    + '</div></div></div>';
+}
+function paintExtrav(body){
+  body.innerHTML = '<div class="panel">'
+    + '<div class="vessel"><div class="vessel-lane" id="vesselLane"></div></div>'
+    + '<div id="extravStepper"></div>'
+    + '<div class="btn-row" style="justify-content:center;margin-top:10px;"><button class="btn sm" id="extravWhy">WHY?</button></div>'
+    + '<div class="why-box" id="extravWhyBox">Why must a leukocyte adhere firmly before crossing the endothelium? Blood flow generates continuous shear stress. A weak, selectin-mediated bond would be swept away before the cell could squeeze between endothelial junctions &mdash; firm integrin-mediated adhesion anchors it long enough for diapedesis to occur.</div>'
+    + '</div>';
+  const lane = body.querySelector('#vesselLane');
+  let endoHTML=''; for(let i=0;i<8;i++){ endoHTML+='<div class="endo-cell" style="left:'+(i*46+10)+'px;"></div>'; }
+  endoHTML += '<div class="leuko-token" id="leukoToken" style="left:20px;top:20px;">WBC</div>';
+  lane.innerHTML = endoHTML;
+  const token = lane.querySelector('#leukoToken');
+  function positionToken(i){
+    const xs=[20,90,160,230,280,320], ys=[20,15,15,10,55,55];
+    token.style.left = xs[i]+'px'; token.style.top = ys[i]+'px';
+    token.style.transform = i>=4 ? 'scale(0.85)' : 'scale(1)';
+  }
+  mountStepper(body.querySelector('#extravStepper'), EXTRAV_STAGES, (s,i)=>{
+    body.querySelector('#stCanvas').style.display='none';
+    body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+(s.tag?' '+chip(s.tag):'')+'</h3><p>'+s.desc+'</p>';
+    positionToken(i);
+  });
+  body.querySelector('#extravWhy').onclick=()=>body.querySelector('#extravWhyBox').classList.toggle('open');
+}
+function renderWBC(root){
+  let sub='cells', active=WBC_TYPES[0].id;
+  function paint(){
+    root.innerHTML = moduleHeader('Module 05 &middot; Leukocytes','Five Cell Types &amp; Extravasation')
+      + tabsBar([{id:'cells',label:'CELL TYPES'},{id:'extrav',label:'EXTRAVASATION SIMULATOR'}], sub)
+      + '<div id="wbcBody"></div>';
+    wireTabs(root, t=>{ sub=t; paint(); });
+    const body=root.querySelector('#wbcBody');
+    if(sub==='cells') paintCells(body, ()=>active, v=>active=v); else paintExtrav(body);
+  }
+  paint();
+}
+function renderMono(root){
+  root.innerHTML = moduleHeader('Module 06 &middot; Monocytes','Blood &rarr; Tissue &rarr; Macrophage')
+    + '<div class="panel"><div id="monoStepper"></div></div>'
+    + '<div class="panel" style="margin-top:16px;"><h3 style="text-align:center;">Phagocytosis</h3>'
+    +   '<div style="position:relative;height:220px;display:flex;align-items:center;justify-content:center;" id="phagoStage">'
+    +     '<svg viewBox="0 0 200 200" width="220" height="220"><path d="M50 60 C30 90 40 150 90 160 C140 170 170 130 150 90 C135 60 90 40 50 60 Z" fill="var(--mono-c)" opacity="0.9"/></svg>'
+    +     '<div id="phagoParticle" style="position:absolute;left:16px;top:20px;width:18px;height:18px;border-radius:50%;background:var(--marrow-red);transition:left 1s ease,top 1s ease,opacity .4s ease .9s;"></div>'
+    +     '<div id="phagoBlob" style="position:absolute;left:96px;top:96px;width:16px;height:16px;border-radius:50%;background:#12181f;opacity:0;transition:opacity .4s ease;"></div>'
+    +   '</div>'
+    +   '<div class="btn-row" style="justify-content:center;"><button class="btn sm primary" id="phagoBtn">SIMULATE PHAGOCYTOSIS</button><button class="btn sm ghost" id="phagoReset">RESET</button></div>'
+    +   '<p id="phagoCaption" style="text-align:center;color:var(--text-dim);min-height:20px;"></p>'
+    + '</div>'
+    + '<div class="panel" style="margin-top:16px;"><h3>Macrophage Functions</h3><div class="select-grid" id="monoChips">'
+    +   ['Cytokine production','Debris clearance','Tissue repair','Antigen presentation'].map(t=>'<button class="pill" data-t="'+t+'">'+t+'</button>').join('')
+    + '</div><div id="monoChipInfo" class="side-note"></div></div>';
+
+  mountStepper(root.querySelector('#monoStepper'), MONO_STAGES, (s,i)=>{
+    root.querySelector('#stCanvas').innerHTML = '<div class="flow-diagram">'+MONO_STAGES.map((st,si)=>flowNode(st.name, si===i)+(si<MONO_STAGES.length-1?flowArrow():'')).join('')+'</div>';
+    root.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+  });
+
+  const particle = root.querySelector('#phagoParticle'), blob=root.querySelector('#phagoBlob');
+  root.querySelector('#phagoBtn').onclick = ()=>{
+    particle.style.left='96px'; particle.style.top='96px';
+    setTimeout(()=>{ particle.style.opacity='0'; blob.style.opacity='1'; const cap=root.querySelector('#phagoCaption'); if(cap) cap.textContent='The particle is engulfed into a phagosome, which fuses with a lysosome (phagolysosome) for degradation.'; }, 950);
+  };
+  root.querySelector('#phagoReset').onclick=()=>{
+    particle.style.transition='none'; particle.style.opacity='1'; particle.style.left='16px'; particle.style.top='20px';
+    blob.style.opacity='0'; root.querySelector('#phagoCaption').textContent='';
+    requestAnimationFrame(()=>{ particle.style.transition='left 1s ease,top 1s ease,opacity .4s ease .9s'; });
+  };
+  const chipInfo = {'Cytokine production':'Releases TNF-α, IL-1, and IL-6 to coordinate and amplify the inflammatory response.','Debris clearance':'Phagocytoses dead cells, pathogens, and tissue debris, keeping the tissue clean.','Tissue repair':'Secretes growth factors that promote angiogenesis and remodeling after injury.','Antigen presentation':'Processes captured antigen and displays peptides on MHC II to CD4+ T cells, linking to adaptive immunity (Module 07).'};
+  root.querySelectorAll('#monoChips .pill').forEach(b=>b.onclick=()=>{ root.querySelector('#monoChipInfo').textContent = chipInfo[b.dataset.t]; });
+}
+
+function renderAPC(root){
+  let sub='types', mhcIdx=0, showAdvanced=false;
+  function paint(){
+    root.innerHTML = moduleHeader('Module 07 &middot; Antigen-Presenting Cells','MHC Pathways &amp; the Bridge to Adaptive Immunity')
+      + tabsBar([{id:'types',label:'APC TYPES'},{id:'present',label:'ANTIGEN PRESENTATION'},{id:'mhc',label:'MHC SIMULATOR'},{id:'bridge',label:'INNATE → ADAPTIVE'}], sub)
+      + '<div id="apcBody"></div>';
+    wireTabs(root, t=>{ sub=t; paint(); });
+    const body=root.querySelector('#apcBody');
+    if(sub==='types') paintTypes(body);
+    else if(sub==='present') paintPresent(body);
+    else if(sub==='mhc') paintMHC(body);
+    else paintBridge(body);
+  }
+  function paintTypes(body){
+    body.innerHTML = '<div class="grid-3">'+APC_TYPES.map(a=>'<div class="compare-box"><h4>'+a.name+'</h4><p>'+a.role+'</p><p class="side-note">'+a.mhc+'</p></div>').join('')+'</div>';
+  }
+  function paintPresent(body){
+    const STAGES=[
+      {name:'Antigen', desc:'A foreign antigen (protein or microbe fragment) is encountered.'},
+      {name:'Capture', desc:'The APC captures it by phagocytosis or receptor-mediated endocytosis.'},
+      {name:'Processing', desc:'Proteases (endosomal/lysosomal for exogenous material, or the proteasome for cytosolic proteins) break the antigen into fragments.'},
+      {name:'Peptide', desc:'A short peptide fragment is generated.'},
+      {name:'MHC loading', desc:'The peptide is loaded into the groove of an MHC I or MHC II molecule.'},
+      {name:'T cell', desc:'The peptide-MHC complex is displayed and recognized by a T cell receptor.'}
+    ];
+    body.innerHTML = '<div class="panel"><div id="presentStepper"></div></div>';
+    mountStepper(body.querySelector('#presentStepper'), STAGES, (s,i)=>{
+      body.querySelector('#stCanvas').innerHTML = '<div class="flow-diagram">'+STAGES.map((st,si)=>flowNode(st.name, si===i)+(si<STAGES.length-1?flowArrow():'')).join('')+'</div>';
+      body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+    });
+  }
+  function pool(){ return showAdvanced ? MHC_SCENARIOS : MHC_SCENARIOS.filter(s=>s.id!==6); }
+  function paintMHC(body){
+    const scenarios = pool();
+    const sc = scenarios[mhcIdx % scenarios.length];
+    body.innerHTML = '<div class="panel">'
+      + '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:14px;"><input type="checkbox" id="advToggle" '+(showAdvanced?'checked':'')+'> Show advanced: cross-presentation</label>'
+      + '<p style="font-size:15px;">'+sc.desc+'</p>'
+      + '<p style="color:var(--text-dim);">Which pathway should present this antigen?</p>'
+      + '<div class="mhc-drop" id="mhcDrop">'
+      +   '<div class="mhc-target" data-p="I"><h4>MHC I</h4><p class="side-note">&rarr; CD8+ cytotoxic T cell</p></div>'
+      +   '<div class="mhc-target" data-p="II"><h4>MHC II</h4><p class="side-note">&rarr; CD4+ helper T cell</p></div>'
+      + '</div>'
+      + '<div class="explain" id="mhcExplain">'+sc.explain+'</div>'
+      + '<div class="btn-row" style="margin-top:14px;"><button class="btn sm" id="mhcNext">NEXT SCENARIO &rarr;</button></div>'
+      + '</div>';
+    body.querySelector('#advToggle').onchange = (e)=>{ showAdvanced=e.target.checked; mhcIdx=0; paintMHC(body); };
+    let answered=false;
+    body.querySelectorAll('.mhc-target').forEach(t=>t.onclick=()=>{
+      if(answered) return; answered=true;
+      body.querySelectorAll('.mhc-target').forEach(x=>{
+        if(x.dataset.p===sc.correct) x.classList.add('correct');
+        else if(x===t) x.classList.add('wrong');
+      });
+      body.querySelector('#mhcExplain').classList.add('open');
+    });
+    body.querySelector('#mhcNext').onclick=()=>{ mhcIdx++; paintMHC(body); };
+  }
+  function paintBridge(body){
+    body.innerHTML = '<div class="panel"><div id="bridgeStepper"></div>'
+      + '<p style="text-align:center;color:var(--text-dim);margin-top:10px;">This is why antigen-presenting cells bridge innate and adaptive immunity: an innate sentinel (the dendritic cell) triggers a specific, adaptive T-cell response.</p></div>';
+    mountStepper(body.querySelector('#bridgeStepper'), INNATE_ADAPTIVE_STAGES, (s,i)=>{
+      body.querySelector('#stCanvas').innerHTML = '<div class="flow-diagram">'+INNATE_ADAPTIVE_STAGES.map((st,si)=>flowNode(st.name, si===i)+(si<INNATE_ADAPTIVE_STAGES.length-1?flowArrow():'')).join('')+'</div>';
+      body.querySelector('#stCaption').innerHTML = '<h3>'+(i+1)+'. '+s.name+'</h3><p>'+s.desc+'</p>';
+    }, {interval:2400});
+  }
+  paint();
+}
+function orderCaseHTML(c){
+  return '<p class="side-note" style="font-style:italic;">'+c.vignette+'</p>'
+    + '<div class="quiz-stem">'+c.question+'</div>'
+    + '<p class="side-note">Click the steps below to place them in order.</p>'
+    + '<div class="order-pool" id="orderPool"></div>'
+    + '<div class="order-slots" id="orderSlots"></div>'
+    + '<div class="btn-row"><button class="btn sm primary" id="orderCheck">CHECK ORDER</button><button class="btn sm ghost" id="orderReset">RESET</button></div>'
+    + '<div class="explain" id="orderExplain">'+c.explain+'</div>'
+    + '<div class="btn-row" style="margin-top:10px;"><button class="btn" id="caseNext" style="display:none;">NEXT CASE &rarr;</button></div>';
+}
+function wireOrderCase(c, body, nextCase){
+  let pool = shuffle(c.items.map((label,i)=>({label,i})));
+  let slots = [];
+  function render(){
+    body.querySelector('#orderPool').innerHTML = pool.map(p=>'<button class="order-chip" data-i="'+p.i+'">'+p.label+'</button>').join('') || '<span class="side-note">&mdash;</span>';
+    body.querySelector('#orderSlots').innerHTML = slots.length ? slots.map((p,si)=>'<button class="order-chip" data-i="'+p.i+'" style="border-color:var(--accent);">'+(si+1)+'. '+p.label+'</button>').join('') : '<span class="side-note">Click steps above to place them here.</span>';
+    body.querySelectorAll('#orderPool .order-chip').forEach(b=>b.onclick=()=>{
+      const idx=+b.dataset.i, item=pool.find(p=>p.i===idx);
+      pool=pool.filter(p=>p.i!==idx); slots.push(item); render();
+    });
+    body.querySelectorAll('#orderSlots .order-chip').forEach(b=>b.onclick=()=>{
+      const idx=+b.dataset.i, item=slots.find(p=>p.i===idx);
+      slots=slots.filter(p=>p.i!==idx); pool.push(item); render();
+    });
+  }
+  render();
+  body.querySelector('#orderCheck').onclick=()=>{
+    const order = slots.map(p=>p.i);
+    const correct = order.length===c.correctOrder.length && order.every((v,idx)=>v===c.correctOrder[idx]);
+    const ex = body.querySelector('#orderExplain');
+    ex.classList.add('open'); ex.style.borderColor = correct ? 'var(--good)' : 'var(--bad)';
+    body.querySelector('#caseNext').style.display='inline-flex';
+  };
+  body.querySelector('#orderReset').onclick=()=>{
+    pool = shuffle(c.items.map((label,i)=>({label,i}))); slots=[]; render();
+    body.querySelector('#orderExplain').classList.remove('open');
+    body.querySelector('#caseNext').style.display='none';
+  };
+  body.querySelector('#caseNext').onclick = nextCase;
+}
+function renderClinical(root){
+  let caseIdx=0;
+  function paint(){
+    const c = CLINICAL_CASES[caseIdx];
+    root.innerHTML = moduleHeader('Module 08 &middot; Clinical Connection','Short Reasoning Cases')
+      + '<div class="quiz-meta"><span>CASE '+(caseIdx+1)+' / '+CLINICAL_CASES.length+'</span><span>ACTIVE RECALL</span></div>'
+      + '<div class="progressline"><div class="progressline-fill" style="width:'+(caseIdx/CLINICAL_CASES.length*100)+'%"></div></div>'
+      + '<div class="panel quiz-card" id="caseBody"></div>';
+    const body = root.querySelector('#caseBody');
+    const goNext = ()=>{ caseIdx=(caseIdx+1)%CLINICAL_CASES.length; paint(); };
+    if(c.type==='mcq'){
+      body.innerHTML = '<p class="side-note" style="font-style:italic;">'+c.vignette+'</p><div id="caseInner"></div>';
+      const cb = ()=>{}; cb.next = goNext;
+      renderMCQ(body.querySelector('#caseInner'), {stem:c.question, options:c.options, correct:c.correct, explain:c.explain}, cb);
+    } else {
+      body.innerHTML = orderCaseHTML(c);
+      wireOrderCase(c, body, goNext);
+    }
+  }
+  paint();
+}
+
+function renderQuiz(root){
+  let mode='practice';
+  const missed = {};
+  let usedRecently = [];
+  function paint(){
+    root.innerHTML = moduleHeader('Module 09 &middot; Test Yourself','Active Recall &amp; Exam Mode')
+      + '<div class="btn-row" style="margin-bottom:20px;">'
+      +   '<button class="btn '+(mode==='practice'?'primary':'')+'" id="modePractice">PRACTICE (TEST YOURSELF)</button>'
+      +   '<button class="btn '+(mode==='exam'?'primary':'')+'" id="modeExam">EXAM MODE (18 QUESTIONS)</button>'
+      + '</div><div id="quizArea"></div>';
+    root.querySelector('#modePractice').onclick=()=>{ mode='practice'; paint(); };
+    root.querySelector('#modeExam').onclick=()=>{ mode='exam'; paint(); };
+    if(mode==='practice') startPractice(); else startExam();
+  }
+  function pickPracticeQuestion(){
+    let pool = QUESTION_BANK.filter(q=>!usedRecently.includes(q));
+    if(pool.length===0){ usedRecently=[]; pool=QUESTION_BANK.slice(); }
+    const missedTags = Object.keys(missed).filter(t=>missed[t]>0);
+    let candidates = pool;
+    if(missedTags.length && Math.random()<0.5){
+      const weighted = pool.filter(q=>missedTags.includes(q.tag));
+      if(weighted.length) candidates = weighted;
+    }
+    const q = candidates[Math.floor(Math.random()*candidates.length)];
+    usedRecently.push(q); if(usedRecently.length>8) usedRecently.shift();
+    return q;
+  }
+  function startPractice(){
+    const area = root.querySelector('#quizArea');
+    function paintMissedList(){
+      const el = area.querySelector('#missedList'); if(!el) return;
+      const tags = Object.keys(missed).filter(t=>missed[t]>0);
+      el.innerHTML = tags.length ? tags.map(t=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-soft);"><span>'+t+'</span><span>&times;'+missed[t]+'</span></div>').join('') : '<p>Nothing flagged yet &mdash; keep going.</p>';
+    }
+    function next(){
+      const q = pickPracticeQuestion();
+      area.innerHTML = '<div class="grid-2"><div class="panel quiz-card" id="pInner"></div>'
+        + '<div class="panel"><h3 style="font-size:14px;">Concepts to revisit</h3><div id="missedList" style="font-size:12.5px;color:var(--text-dim);"></div></div></div>';
+      paintMissedList();
+      const cb = (ok)=>{ if(!ok){ missed[q.tag]=(missed[q.tag]||0)+1; } else if(missed[q.tag]){ missed[q.tag]=Math.max(0,missed[q.tag]-1); } };
+      cb.next = next;
+      renderMCQ(area.querySelector('#pInner'), q, cb);
+    }
+    next();
+  }
+  function startExam(){
+    const area = root.querySelector('#quizArea');
+    const set = shuffle(QUESTION_BANK).slice(0, Math.min(18, QUESTION_BANK.length));
+    let idx=0; const answers=[];
+    function next(){
+      if(idx>=set.length) return finish();
+      area.innerHTML = '<div class="quiz-meta"><span>QUESTION '+(idx+1)+' / '+set.length+'</span><span>EXAM MODE</span></div>'
+        + '<div class="progressline"><div class="progressline-fill" style="width:'+(idx/set.length*100)+'%"></div></div>'
+        + '<div class="panel quiz-card" id="eInner"></div>';
+      const q = set[idx];
+      const cb = (ok)=>{ answers.push({q,ok}); };
+      cb.next = ()=>{ idx++; next(); };
+      renderMCQ(area.querySelector('#eInner'), q, cb);
+    }
+    function finish(){
+      const correctCount = answers.filter(a=>a.ok).length;
+      const pct = Math.round(correctCount/set.length*100);
+      const wrong = answers.filter(a=>!a.ok);
+      const topics = [...new Set(wrong.map(a=>a.q.tag))];
+      area.innerHTML = '<div class="result-hero"><div class="result-score">'+pct+'%</div><p>'+correctCount+' / '+set.length+' correct</p></div>'
+        + (topics.length ? '<div class="panel"><h3>Topics to review</h3><div class="btn-row">'+topics.map(t=>chip(t)).join('')+'</div></div>' : '<div class="panel"><p>Excellent &mdash; no weak topics detected this round.</p></div>')
+        + (wrong.length ? '<div class="panel" style="margin-top:16px;"><h3>Review</h3>'+wrong.map(a=>'<div class="review-row"><span>'+esc(a.q.stem)+'</span><span style="color:var(--bad);">Missed</span></div><p class="side-note">'+a.q.explain+'</p>').join('')+'</div>' : '')
+        + '<div class="btn-row" style="margin-top:16px;"><button class="btn primary" id="retakeBtn">RETAKE EXAM</button></div>';
+      area.querySelector('#retakeBtn').onclick = startExam;
+    }
+    next();
+  }
+  paint();
+}
+/* === VIEWS_END === */
+
+/* === INIT_START === */
+const ROUTES = { home:renderHome, mri:renderMRI, hemato:renderHemato, eryth:renderEryth, rbc:renderRBC, wbc:renderWBC, mono:renderMono, apc:renderAPC, clinical:renderClinical, quiz:renderQuiz };
+const CRUMB_LABELS = { home:'Home', mri:'Bone Marrow MRI', hemato:'Hematopoiesis', eryth:'Erythropoiesis', rbc:'Erythrocyte Physiology', wbc:'Leukocytes', mono:'Monocytes', apc:'Antigen-Presenting Cells', clinical:'Clinical Connection', quiz:'Test Yourself' };
+function navigate(route){ location.hash = route; }
+function renderRoute(){
+  const r = (location.hash||'').replace('#','') || 'home';
+  const fn = ROUTES[r] || renderHome;
+  const app = document.getElementById('app');
+  document.getElementById('crumb').textContent = CRUMB_LABELS[r] || 'Home';
+  fn(app);
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', renderRoute);
+renderRoute();
+/* === INIT_END === */
+</script>
+</body>
+</html>
